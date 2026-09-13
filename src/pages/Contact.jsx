@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { laundryClient } from "@/api/authClient";
 import { toast } from "@/components/ui/use-toast";
 import PublicNavbar from "@/components/PublicNavbar";
 import Footer from "@/components/Footer";
@@ -14,7 +14,7 @@ export default function Contact() {
     e.preventDefault();
     setSending(true);
     try {
-      await base44.functions.invoke("sendContactEmail", form);
+      await laundryClient.sendContactMessage(form);
       toast({ title: "Message sent!", description: "We'll get back to you shortly." });
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch (err) {

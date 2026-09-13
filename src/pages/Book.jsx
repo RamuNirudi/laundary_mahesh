@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight, ArrowLeft, Check, MapPin, Calendar, Clock, Shirt, Sparkles, Loader2, Phone, Ticket } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, MapPin, Calendar, Clock, Shirt, Sparkles, Loader2, Phone, Ticket, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authClient, laundryClient } from "@/api/authClient";
 import { toast } from "@/components/ui/use-toast";
@@ -15,6 +15,14 @@ const TIME_SLOTS = [
   "6:00 PM – 8:00 PM",
 ];
 
+const toLineItem = (svc) => ({
+  service_id: svc.id,
+  service_name: svc.name,
+  quantity: 1,
+  price: Number(svc.price) || 0,
+  price_unit: svc.price_unit || "per item",
+});
+
 export default function Book() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +33,6 @@ export default function Book() {
   const [services, setServices] = useState([]);
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState([]);
-  const [items, setItems] = useState(1);
   const [instructions, setInstructions] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
@@ -36,6 +43,7 @@ export default function Book() {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponChecking, setCouponChecking] = useState(false);
   const [couponError, setCouponError] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
 
   useEffect(() => {
     authClient.isAuthenticated() ? authClient.me().then((u) => {
@@ -49,15 +57,29 @@ export default function Book() {
     laundryClient.getServices().then(setServices).catch(() => {});
   }, []);
 
+  // A coupon applied against one basket may no longer qualify after an edit, so
+  // drop it and make the customer re-apply rather than show a stale saving.
   useEffect(() => {
-    if (preselectedId && services.length > 0) {
-      const svc = services.find((s) => s.id === preselectedId);
-      if (svc && !selected.find((x) => x.service_id === svc.id)) {
-        setSelected([{ service_id: svc.id, service_name: svc.name, quantity: 1, price: svc.price || 0 }]);
-        setStep(2);
-      }
-    }
-  }, [preselectedId, services]);
+    setAppliedCoupon((current) => {
+      if (!current) return current;
+      setCouponDiscount(0);
+      setCouponError("Your basket changed. Please apply the coupon again.");
+      return null;
+    });
+  }, [selected]);
+
+  // Preselect the service the customer clicked on /services, but leave them on
+  // step 1 so they can add more. Runs once, and appends rather than replaces.
+  const [preselectApplied, setPreselectApplied] = useState(false);
+  useEffect(() => {
+    if (preselectApplied || !preselectedId || services.length === 0) return;
+    const svc = services.find((s) => s.id === preselectedId);
+    setPreselectApplied(true);
+    if (!svc) return;
+    setSelected((current) =>
+      current.some((x) => x.service_id === svc.id) ? current : [...current, toLineItem(svc)],
+    );
+  }, [preselectedId, services, preselectApplied]);
 
   if (!authChecked) {
     return (
@@ -68,12 +90,11 @@ export default function Book() {
   }
 
   const toggleService = (svc) => {
-    const exists = selected.find((x) => x.service_id === svc.id);
-    if (exists) {
-      setSelected(selected.filter((x) => x.service_id !== svc.id));
-    } else {
-      setSelected([...selected, { service_id: svc.id, service_name: svc.name, quantity: 1, price: svc.price || 0 }]);
-    }
+    setSelected((current) =>
+      current.some((x) => x.service_id === svc.id)
+        ? current.filter((x) => x.service_id !== svc.id)
+        : [...current, toLineItem(svc)],
+    );
   };
 
   const updateQty = (id, qty) => {
@@ -81,16 +102,31 @@ export default function Book() {
   };
 
   const totalItems = selected.reduce((sum, s) => sum + s.quantity, 0);
+  const subtotal = Math.round(selected.reduce((sum, s) => sum + s.price * s.quantity, 0) * 100) / 100;
+  const payable = Math.max(0, Math.round((subtotal - couponDiscount) * 100) / 100);
 
   const today = new Date().toISOString().split("T")[0];
 
   const applyCoupon = async () => {
     if (!couponCode.trim()) return;
-    setCouponError("Coupon support is not available yet.");
+    setCouponChecking(true);
+    setCouponError("");
+    try {
+      // The server prices the coupon; this only previews what it returned.
+      const { coupon, discount } = await laundryClient.validateCoupon(couponCode.trim(), subtotal);
+      setAppliedCoupon(coupon);
+      setCouponDiscount(discount);
+    } catch (err) {
+      setAppliedCoupon(null);
+      setCouponDiscount(0);
+      setCouponError(err.message);
+    }
+    setCouponChecking(false);
   };
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
+    setCouponDiscount(0);
     setCouponCode("");
     setCouponError("");
   };
@@ -108,6 +144,7 @@ export default function Book() {
         pickup_date: date,
         pickup_time: time,
         phone,
+        coupon_code: appliedCoupon?.code,
       });
       toast({ title: "Booking confirmed!", description: `Your booking ID is ${booking.booking_id}` });
       navigate("/");
@@ -188,8 +225,20 @@ export default function Book() {
           {/* Step 2: Details */}
           {step === 2 && (
             <div>
-              <h2 className="font-heading text-xl font-semibold">Service details</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Set quantities and add any special instructions.</p>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-heading text-xl font-semibold">Service details</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {selected.length} service{selected.length === 1 ? "" : "s"} selected. Set quantities and add any special instructions.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setStep(1)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
+                >
+                  <Plus className="h-4 w-4" /> Add more services
+                </button>
+              </div>
               <div className="mt-6 space-y-3">
                 {selected.map((s) => (
                   <div key={s.service_id} className="flex items-center justify-between rounded-xl border border-border p-4">
@@ -205,15 +254,11 @@ export default function Book() {
                   </div>
                 ))}
               </div>
-              <div className="mt-5">
-                <label className="text-sm font-medium">Total items</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={items}
-                  onChange={(e) => setItems(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                />
+              {/* Derived from the quantities above: a separate editable field only
+                  ever disagreed with the basket (and was never submitted). */}
+              <div className="mt-5 flex items-center justify-between rounded-xl border border-border bg-secondary/30 px-4 py-3">
+                <span className="text-sm font-medium">Total items</span>
+                <span className="font-heading text-lg font-bold text-primary">{totalItems}</span>
               </div>
               <div className="mt-4">
                 <label className="text-sm font-medium">Special instructions</label>
@@ -346,7 +391,26 @@ export default function Book() {
                     </div>
                   )}
                   {couponError && <p className="mt-1.5 text-xs text-destructive">{couponError}</p>}
-                  <p className="mt-1.5 text-xs text-muted-foreground">Discount will be applied when the final amount is set.</p>
+                </div>
+
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>₹{subtotal.toLocaleString()}</span>
+                  </div>
+                  {couponDiscount > 0 && (
+                    <div className="mt-1.5 flex justify-between text-sm text-green-700">
+                      <span>Coupon {appliedCoupon?.code}</span>
+                      <span>-₹{couponDiscount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="mt-2.5 flex justify-between border-t border-border pt-2.5 text-base font-semibold">
+                    <span>Estimated total</span>
+                    <span>₹{payable.toLocaleString()}</span>
+                  </div>
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    Final charges are confirmed after we weigh and inspect your items.
+                  </p>
                 </div>
               </div>
               <div className="mt-8 flex justify-between">

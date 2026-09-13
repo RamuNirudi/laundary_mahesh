@@ -12,18 +12,21 @@ const NAV_LINKS = [
   { label: "Contact", path: "/contact" },
 ];
 
-export default function PublicNavbar() {
-  const [scrolled, setScrolled] = useState(false);
+// `solid` keeps the bar opaque from the first pixel. The transparent-until-
+// scrolled treatment only works over the marketing hero; on a dashboard it
+// leaves the links floating over page content.
+export default function PublicNavbar({ solid = false }) {
+  const [scrolled, setScrolled] = useState(solid);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(solid || window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [solid]);
 
   useEffect(() => {
     if (authClient.isAuthenticated()) authClient.me().then(setUser).catch(() => authClient.logout());
@@ -31,15 +34,16 @@ export default function PublicNavbar() {
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
-  const goDashboard = () => {
-    if (!user) { navigate("/login"); return; }
-    navigate("/dashboard");
-  };
+  const isAdmin = user?.role === "admin";
+  const isServiceBoy = user?.role === "service_boy";
 
-  const goAdmin = () => {
-    if (user?.role === "admin") { navigate("/admin"); return; }
-    navigate(user ? "/dashboard" : "/login?returnTo=/admin");
-  };
+  // Each role gets exactly one portal button: admins the admin panel, service
+  // executives their pickup list, customers their dashboard.
+  const portal = isAdmin
+    ? { label: "Admin Dashboard", path: "/admin" }
+    : isServiceBoy
+      ? { label: "My Pickups", path: "/serviceboy" }
+      : { label: "My Dashboard", path: "/dashboard" };
 
   return (
     <header className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? "glass border-b border-border shadow-sm shadow-primary/5" : "bg-transparent"}`}>
@@ -74,10 +78,7 @@ export default function PublicNavbar() {
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
           {user ? (
-            <>
-              <Button variant="ghost" size="sm" onClick={goAdmin} className="rounded-full">Admin</Button>
-              <Button onClick={goDashboard} size="sm" className="rounded-full shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30">My Dashboard</Button>
-            </>
+            <Button onClick={() => navigate(portal.path)} size="sm" className="rounded-full shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30">{portal.label}</Button>
           ) : (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate("/login")} className="rounded-full">Login</Button>
@@ -104,10 +105,7 @@ export default function PublicNavbar() {
             ))}
             <div className="flex gap-2 pt-2">
               {user ? (
-                <>
-                  <Button variant="outline" onClick={goAdmin} className="flex-1 rounded-full">Admin</Button>
-                  <Button onClick={goDashboard} className="flex-1 rounded-full">Dashboard</Button>
-                </>
+                <Button onClick={() => navigate(portal.path)} className="flex-1 rounded-full">{portal.label}</Button>
               ) : (
                 <>
                   <Button variant="outline" onClick={() => navigate("/login")} className="flex-1 rounded-full">Login</Button>

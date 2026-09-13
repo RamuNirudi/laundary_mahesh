@@ -33,7 +33,7 @@ export default function MyAddress() {
   };
 
   return (
-    <DashboardLayout role="customer" navItems={NAV} title="Customer Panel">
+    <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
       <h1 className="font-heading text-2xl font-bold tracking-tight">My Address</h1>
       <p className="mt-1 text-sm text-muted-foreground">Save your default pickup address for faster booking.</p>
 

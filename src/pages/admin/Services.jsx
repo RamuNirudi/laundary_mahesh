@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, Save, Power, Search } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { adminClient } from "@/api/adminClient";
 import { toast } from "@/components/ui/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard, CalendarDays, Sparkles, Users, UserCog, Receipt, BarChart3, Settings, Ticket } from "lucide-react";
@@ -30,9 +30,9 @@ export default function AdminServices() {
   const [showForm, setShowForm] = useState(false);
 
   const load = () => {
-    base44.entities.Service.list("sort_order", 500)
+    adminClient.getServices()
       .then(setServices)
-      .catch(() => {})
+      .catch((err) => toast({ title: "Failed to load services", description: err.message, variant: "destructive" }))
       .finally(() => setLoading(false));
   };
 
@@ -43,10 +43,10 @@ export default function AdminServices() {
   const handleSave = async (data) => {
     try {
       if (editing && editing.id) {
-        await base44.entities.Service.update(editing.id, data);
+        await adminClient.updateService(editing.id, data);
         toast({ title: "Service updated" });
       } else {
-        await base44.entities.Service.create(data);
+        await adminClient.createService(data);
         toast({ title: "Service created" });
       }
       setShowForm(false);
@@ -59,7 +59,7 @@ export default function AdminServices() {
 
   const toggleActive = async (svc) => {
     try {
-      await base44.entities.Service.update(svc.id, { active: !svc.active });
+      await adminClient.updateService(svc.id, { ...svc, active: !svc.active });
       toast({ title: `Service ${!svc.active ? "enabled" : "disabled"}` });
       load();
     } catch (err) {
@@ -70,7 +70,7 @@ export default function AdminServices() {
   const handleDelete = async (svc) => {
     if (!confirm(`Delete "${svc.name}"? This cannot be undone.`)) return;
     try {
-      await base44.entities.Service.delete(svc.id);
+      await adminClient.deleteService(svc.id);
       toast({ title: "Service deleted" });
       load();
     } catch (err) {

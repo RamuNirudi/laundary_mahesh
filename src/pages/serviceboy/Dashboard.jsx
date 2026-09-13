@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MapPin, Clock, Phone, User, Truck, PackageCheck, Loader2, CheckCircle2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { authClient } from "@/api/authClient";
+import { serviceBoyClient } from "@/api/adminClient";
 import { toast } from "@/components/ui/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard } from "lucide-react";
@@ -9,6 +10,17 @@ const NAV = [
   { label: "Today's Pickups", path: "/serviceboy", icon: LayoutDashboard },
 ];
 
+const NEXT_STEP = {
+  "Booking Requested": { status: "Clothes Picked Up", label: "Mark Picked Up", icon: Truck },
+  "Booking Confirmed": { status: "Clothes Picked Up", label: "Mark Picked Up", icon: Truck },
+  "Service Boy Assigned": { status: "Clothes Picked Up", label: "Mark Picked Up", icon: Truck },
+  "Clothes Picked Up": { status: "Cleaning in Progress", label: "Start Cleaning", icon: PackageCheck },
+  "Cleaning in Progress": { status: "Ready for Delivery", label: "Mark Ready for Delivery", icon: PackageCheck },
+  "Ready for Delivery": { status: "Delivered", label: "Mark Delivered", icon: CheckCircle2 },
+};
+
+const nextStep = (status) => NEXT_STEP[status] || null;
+
 export default function ServiceBoyDashboard() {
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -16,13 +28,12 @@ export default function ServiceBoyDashboard() {
   const [updating, setUpdating] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      setUser(u);
-      base44.entities.Booking.filter({ service_boy_id: u.id }, "-created_date", 500)
-        .then(setBookings)
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }).catch(() => setLoading(false));
+    // The API scopes /serviceboy/bookings to the signed-in executive, so the
+    // client never has to filter by id (or be trusted to).
+    Promise.all([authClient.me(), serviceBoyClient.getBookings()])
+      .then(([u, b]) => { setUser(u); setBookings(b); })
+      .catch((err) => toast({ title: "Failed to load pickups", description: err.message, variant: "destructive" }))
+      .finally(() => setLoading(false));
   }, []);
 
   const today = new Date().toISOString().split("T")[0];
@@ -32,10 +43,9 @@ export default function ServiceBoyDashboard() {
   const updateStatus = async (booking, newStatus) => {
     setUpdating(booking.id);
     try {
-      await base44.functions.invoke("updateBookingStatus", { booking_id: booking.id, status: newStatus });
+      await serviceBoyClient.updateStatus(booking.id, newStatus);
       toast({ title: `Status updated to "${newStatus}"` });
-      const refreshed = await base44.entities.Booking.filter({ service_boy_id: user.id }, "-created_date", 500);
-      setBookings(refreshed);
+      setBookings(await serviceBoyClient.getBookings());
     } catch (err) {
       toast({ title: "Update failed", description: err.message, variant: "destructive" });
     }
@@ -96,25 +106,23 @@ export default function ServiceBoyDashboard() {
 
               {/* Action bar */}
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                {b.status === "Service Boy Assigned" && (
-                  <button disabled={updating === b.id} onClick={() => updateStatus(b, "Clothes Picked Up")} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
-                    {updating === b.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />} Start Pickup
+                {nextStep(b.status) ? (
+                  <button
+                    disabled={updating === b.id}
+                    onClick={() => updateStatus(b, nextStep(b.status).status)}
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold disabled:opacity-50 ${
+                      nextStep(b.status).status === "Delivered"
+                        ? "bg-emerald-600 text-white hover:shadow-lg hover:shadow-emerald-600/30"
+                        : "bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/30"
+                    }`}
+                  >
+                    {updating === b.id ? <Loader2 className="h-4 w-4 animate-spin" /> : React.createElement(nextStep(b.status).icon, { className: "h-4 w-4" })}
+                    {nextStep(b.status).label}
                   </button>
-                )}
-                {b.status === "Clothes Picked Up" && (
-                  <button disabled={updating === b.id} onClick={() => updateStatus(b, "Cleaning in Progress")} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
-                    {updating === b.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <PackageCheck className="h-4 w-4" />} Mark Picked Up
-                  </button>
-                )}
-                {b.status === "Cleaning in Progress" && (
-                  <button disabled={updating === b.id} onClick={() => updateStatus(b, "Ready for Delivery")} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
-                    {updating === b.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <PackageCheck className="h-4 w-4" />} Ready for Delivery
-                  </button>
-                )}
-                {b.status === "Ready for Delivery" && (
-                  <button disabled={updating === b.id} onClick={() => updateStatus(b, "Delivered")} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-600 py-3 text-sm font-semibold text-white hover:shadow-lg hover:shadow-emerald-600/30 disabled:opacity-50">
-                    {updating === b.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Mark Delivered
-                  </button>
+                ) : (
+                  <p className="flex-1 rounded-full bg-secondary/50 py-3 text-center text-sm text-muted-foreground">
+                    Waiting for the office to confirm this booking.
+                  </p>
                 )}
               </div>
             </div>

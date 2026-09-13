@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Plus, X, Save, Trash2, IndianRupee, Receipt } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { Plus, X, Save, Trash2, Receipt } from "lucide-react";
+import { adminClient } from "@/api/adminClient";
 import { toast } from "@/components/ui/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard, CalendarDays, Sparkles, Users, UserCog, ReceiptIcon, BarChart3, Settings, Ticket } from "lucide-react";
@@ -27,9 +27,9 @@ export default function AdminExpenses() {
   const [form, setForm] = useState({ name: "", category: "Other", amount: "", date: today, notes: "" });
 
   const load = () => {
-    base44.entities.Expense.list("-date", 500)
+    adminClient.getExpenses()
       .then(setExpenses)
-      .catch(() => {})
+      .catch((err) => toast({ title: "Failed to load expenses", description: err.message, variant: "destructive" }))
       .finally(() => setLoading(false));
   };
 
@@ -39,7 +39,7 @@ export default function AdminExpenses() {
     e.preventDefault();
     if (!form.name || !form.amount || !form.date) { toast({ title: "Please fill all required fields", variant: "destructive" }); return; }
     try {
-      await base44.entities.Expense.create({ ...form, amount: Number(form.amount) });
+      await adminClient.createExpense({ ...form, amount: Number(form.amount) });
       toast({ title: "Expense added" });
       setForm({ name: "", category: "Other", amount: "", date: today, notes: "" });
       setShowForm(false);
@@ -52,7 +52,7 @@ export default function AdminExpenses() {
   const handleDelete = async (exp) => {
     if (!confirm(`Delete "${exp.name}"?`)) return;
     try {
-      await base44.entities.Expense.delete(exp.id);
+      await adminClient.deleteExpense(exp.id);
       toast({ title: "Expense deleted" });
       load();
     } catch (err) {

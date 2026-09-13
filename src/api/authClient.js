@@ -1,36 +1,34 @@
-const API_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api").replace(/\/$/, "");
-const TOKEN_KEY = "laundry_access_token";
+// Authentication and customer-facing endpoints.
 
-async function request(path, options = {}) {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers },
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || "Request failed.");
-  return data;
-}
+import { api, clearToken, getToken, setToken } from "./client";
 
-function saveSession(data) {
-  localStorage.setItem(TOKEN_KEY, data.access_token);
+const saveSession = (data) => {
+  setToken(data.access_token);
   return data.user;
-}
+};
 
 export const authClient = {
-  signup: (payload) => request("/auth/signup", { method: "POST", body: JSON.stringify(payload) }).then(saveSession),
-  login: (email, password) => request("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }).then(saveSession),
-  me: () => request("/auth/me").then(({ user }) => user),
-  updateMe: (payload) => request("/auth/me", { method: "PUT", body: JSON.stringify(payload) }).then(({ user }) => user),
-  requestPasswordReset: (email) => request("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
-  resetPassword: (email, otp, newPassword) => request("/auth/reset-password", { method: "POST", body: JSON.stringify({ email, otp, newPassword }) }),
-  logout: () => localStorage.removeItem(TOKEN_KEY),
-  isAuthenticated: () => Boolean(localStorage.getItem(TOKEN_KEY)),
+  signup: (payload) => api.post("/auth/signup", payload).then(saveSession),
+  login: (email, password) => api.post("/auth/login", { email, password }).then(saveSession),
+  me: () => api.get("/auth/me").then(({ user }) => user),
+  updateMe: (payload) => api.put("/auth/me", payload).then(({ user }) => user),
+  changePassword: (currentPassword, newPassword) =>
+    api.put("/auth/password", { currentPassword, newPassword }),
+  requestPasswordReset: (email) => api.post("/auth/forgot-password", { email }),
+  resetPassword: (email, otp, newPassword) =>
+    api.post("/auth/reset-password", { email, otp, newPassword }),
+  logout: () => clearToken(),
+  isAuthenticated: () => Boolean(getToken()),
 };
 
 export const laundryClient = {
-  getServices: () => request("/services").then(({ services }) => services),
-  createBooking: (payload) => request("/bookings", { method: "POST", body: JSON.stringify(payload) }).then(({ booking }) => booking),
-  getBookings: () => request("/bookings").then(({ bookings }) => bookings),
-  getBooking: (id) => request(`/bookings/${id}`).then(({ booking }) => booking),
+  getServices: () => api.get("/services").then(({ services }) => services),
+  getSettings: () => api.get("/settings").then(({ settings }) => settings),
+  createBooking: (payload) => api.post("/bookings", payload).then(({ booking }) => booking),
+  getBookings: () => api.get("/bookings").then(({ bookings }) => bookings),
+  getBooking: (id) => api.get(`/bookings/${id}`),
+  cancelBooking: (id) => api.post(`/bookings/${id}/cancel`).then(({ booking }) => booking),
+  /** Checks a coupon against the current subtotal and returns { coupon, discount }. */
+  validateCoupon: (code, subtotal) => api.post("/coupons/validate", { code, subtotal }),
+  sendContactMessage: (payload) => api.post("/contact", payload),
 };

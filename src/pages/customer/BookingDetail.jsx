@@ -12,7 +12,7 @@ export default function BookingDetail() {
 
   useEffect(() => {
     laundryClient.getBooking(id)
-      .then(setBooking)
+      .then(({ booking }) => setBooking(booking))
       .catch(() => setBooking(null))
       .finally(() => setLoading(false));
   }, [id]);

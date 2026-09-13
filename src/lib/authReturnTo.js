@@ -10,7 +10,9 @@
 // resolved path to be exactly one leading slash (no "//" prefix, no backslash).
 export function safeReturnTo() {
   const raw = new URLSearchParams(window.location.search).get("returnTo");
-  if (!raw) return "/dashboard";
+  // No explicit destination: the caller decides where to land (the auth
+  // pages send users to their role home, which is the site root for customers).
+  if (!raw) return "";
   try {
     const url = new URL(raw, window.location.origin);
     if (url.origin !== window.location.origin) return "/";
@@ -26,4 +28,12 @@ export function safeReturnTo() {
   } catch {
     return "/";
   }
+}
+// Where each role belongs after signing in. Customers land on the public
+// homepage; staff go straight to their own portal, which is the only part of
+// the app their routes allow.
+export function roleHome(role) {
+  if (role === "admin") return "/admin";
+  if (role === "service_boy") return "/serviceboy";
+  return "/";
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { adminClient } from "@/api/adminClient";
 import { toast } from "@/components/ui/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard, CalendarDays, Sparkles, Users, UserCog as UserCogIcon, Receipt, BarChart3, Settings, Ticket, Plus, Pencil, Trash2, X, Save, Power } from "lucide-react";
@@ -22,7 +22,9 @@ const EMPTY = {
   discount_type: "percentage",
   discount_value: 0,
   min_order_amount: 0,
+  max_discount_amount: 0,
   max_uses: 0,
+  per_user_limit: 0,
   active: true,
   valid_from: "",
   valid_until: "",
@@ -36,11 +38,12 @@ export default function AdminCoupons() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [busyId, setBusyId] = useState(null);
 
   const fetchCoupons = async () => {
     setLoading(true);
     try {
-      const data = await base44.entities.Coupon.list("-created_date", 200);
+      const data = await adminClient.getCoupons();
       setCoupons(data);
     } catch (err) {
       toast({ title: "Failed to load coupons", description: err.message, variant: "destructive" });
@@ -65,16 +68,18 @@ export default function AdminCoupons() {
         discount_type: form.discount_type,
         discount_value: Number(form.discount_value) || 0,
         min_order_amount: Number(form.min_order_amount) || 0,
+        max_discount_amount: Number(form.max_discount_amount) || 0,
         max_uses: Number(form.max_uses) || 0,
+        per_user_limit: Number(form.per_user_limit) || 0,
         active: form.active,
-        valid_from: form.valid_from || undefined,
-        valid_until: form.valid_until || undefined,
+        valid_from: form.valid_from || null,
+        valid_until: form.valid_until || null,
       };
       if (editing) {
-        await base44.entities.Coupon.update(editing.id, payload);
+        await adminClient.updateCoupon(editing.id, payload);
         toast({ title: "Coupon updated" });
       } else {
-        await base44.entities.Coupon.create(payload);
+        await adminClient.createCoupon(payload);
         toast({ title: "Coupon created" });
       }
       setShowForm(false);
@@ -86,24 +91,29 @@ export default function AdminCoupons() {
   };
 
   const handleToggle = async (c) => {
+    setBusyId(c.id);
     try {
-      await base44.entities.Coupon.update(c.id, { active: !c.active });
-      toast({ title: c.active ? "Coupon deactivated" : "Coupon activated" });
+      const { message } = await adminClient.setCouponActive(c.id, !c.active);
+      toast({ title: message });
       fetchCoupons();
     } catch (err) {
       toast({ title: "Toggle failed", description: err.message, variant: "destructive" });
     }
+    setBusyId(null);
   };
 
   const handleDelete = async (c) => {
-    if (!confirm(`Delete coupon "${c.code}"?`)) return;
+    if (!confirm(`Delete coupon "${c.code}"? This cannot be undone.`)) return;
+    setBusyId(c.id);
     try {
-      await base44.entities.Coupon.delete(c.id);
+      await adminClient.deleteCoupon(c.id);
       toast({ title: "Coupon deleted" });
       fetchCoupons();
     } catch (err) {
+      // A redeemed coupon cannot be deleted; the API explains why.
       toast({ title: "Delete failed", description: err.message, variant: "destructive" });
     }
+    setBusyId(null);
   };
 
   const filtered = coupons.filter((c) =>
@@ -156,9 +166,9 @@ export default function AdminCoupons() {
                   {c.description && <p className="mt-2 text-xs text-muted-foreground">{c.description}</p>}
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => openEdit(c)} className="rounded-lg p-1.5 hover:bg-secondary"><Pencil className="h-3.5 w-3.5" /></button>
-                  <button onClick={() => handleToggle(c)} className="rounded-lg p-1.5 hover:bg-secondary"><Power className="h-3.5 w-3.5" /></button>
-                  <button onClick={() => handleDelete(c)} className="rounded-lg p-1.5 hover:bg-destructive/10 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => openEdit(c)} title="Edit coupon" className="rounded-lg p-1.5 hover:bg-secondary"><Pencil className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => handleToggle(c)} disabled={busyId === c.id} title={c.active ? "Deactivate coupon" : "Activate coupon"} className="rounded-lg p-1.5 hover:bg-secondary disabled:opacity-40"><Power className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => handleDelete(c)} disabled={busyId === c.id} title="Delete coupon" className="rounded-lg p-1.5 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"><Trash2 className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
               <div className="mt-4 flex items-baseline gap-1">
@@ -169,7 +179,9 @@ export default function AdminCoupons() {
               </div>
               <div className="mt-3 space-y-1 text-xs text-muted-foreground">
                 {c.min_order_amount > 0 && <p>Min order: ₹{c.min_order_amount}</p>}
+                {c.max_discount_amount > 0 && <p>Max discount: ₹{c.max_discount_amount}</p>}
                 <p>Used: {c.used_count || 0}{c.max_uses > 0 ? ` / ${c.max_uses}` : " (unlimited)"}</p>
+                {c.per_user_limit > 0 && <p>Limit: {c.per_user_limit} per customer</p>}
                 {c.valid_from && <p>From: {c.valid_from}</p>}
                 {c.valid_until && <p>Until: {c.valid_until}</p>}
               </div>
@@ -240,12 +252,34 @@ export default function AdminCoupons() {
                   />
                 </div>
                 <div>
+                  <label className="text-sm font-medium">Max Discount Cap (₹, 0 = none)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.max_discount_amount}
+                    onChange={(e) => setForm({ ...form, max_discount_amount: e.target.value })}
+                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
                   <label className="text-sm font-medium">Max Uses (0 = unlimited)</label>
                   <input
                     type="number"
                     min="0"
                     value={form.max_uses}
                     onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
+                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Uses Per Customer (0 = unlimited)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.per_user_limit}
+                    onChange={(e) => setForm({ ...form, per_user_limit: e.target.value })}
                     className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>

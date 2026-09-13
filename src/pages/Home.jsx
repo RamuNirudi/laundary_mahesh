@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Truck, Sparkles, Shirt, PackageCheck, Check, Star, Clock, ShieldCheck, Zap, Leaf, Award } from "lucide-react";
+import { ArrowRight, Truck, Sparkles, Shirt, PackageCheck, Star, Clock, ShieldCheck, Zap, Leaf, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { laundryClient } from "@/api/authClient";
 import PublicNavbar from "@/components/PublicNavbar";

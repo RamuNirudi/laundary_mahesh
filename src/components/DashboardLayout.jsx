@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { authClient } from "@/api/authClient";
-import { Menu, X, LogOut, Sparkles, Shield } from "lucide-react";
+import { Menu, LogOut, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PublicNavbar from "@/components/PublicNavbar";
 
-export default function DashboardLayout({ role, navItems, title, accent, children }) {
+// `showPublicNavbar` keeps the site navigation on screen inside the panel, so
+// customers do not lose their way back to Home/Services/Contact after opening
+// their dashboard. The bar is 4rem tall; the sidebar and content sit below it.
+export default function DashboardLayout({ role, navItems, title, accent, showPublicNavbar = false, children }) {
   const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     authClient.me().then(setUser).catch(() => {});
@@ -56,14 +59,6 @@ export default function DashboardLayout({ role, navItems, title, accent, childre
       </nav>
 
       <div className="border-t border-border p-4">
-        {user?.role === "admin" && (
-          <Link
-            to="/admin"
-            className="mb-2 flex items-center gap-3 rounded-xl bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
-          >
-            <Shield className="h-4 w-4" /> Admin Panel
-          </Link>
-        )}
         <div className="mb-3 px-2">
           <p className="text-sm font-semibold text-foreground truncate">{user?.full_name || "User"}</p>
           <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
@@ -77,8 +72,14 @@ export default function DashboardLayout({ role, navItems, title, accent, childre
 
   return (
     <div className="min-h-screen bg-secondary/30">
+      {showPublicNavbar && <PublicNavbar solid />}
+
       {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-card lg:block">
+      <aside
+        className={`fixed left-0 z-40 hidden w-64 border-r border-border bg-card lg:block ${
+          showPublicNavbar ? "top-16 h-[calc(100vh-4rem)]" : "top-0 h-screen"
+        }`}
+      >
         {sidebar}
       </aside>
 
@@ -92,9 +93,13 @@ export default function DashboardLayout({ role, navItems, title, accent, childre
         </div>
       )}
 
-      <div className="lg:pl-64">
+      <div className={`lg:pl-64 ${showPublicNavbar ? "pt-16" : ""}`}>
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header
+          className={`sticky z-30 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur-md lg:hidden ${
+            showPublicNavbar ? "top-16" : "top-0"
+          }`}
+        >
           <button onClick={() => setSidebarOpen(true)} className="rounded-lg p-2 hover:bg-secondary">
             <Menu className="h-5 w-5" />
           </button>

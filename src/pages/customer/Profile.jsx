@@ -28,9 +28,19 @@ export default function Profile() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    // Both are mandatory account-wide: a booking cannot be collected without
+    // someone to ask for and a number to call.
+    if (!name.trim() || !phone.trim()) {
+      toast({
+        title: "Missing details",
+        description: "Your full name and phone number are both required.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     try {
-      const updatedUser = await authClient.updateMe({ full_name: name, phone });
+      const updatedUser = await authClient.updateMe({ full_name: name.trim(), phone: phone.trim() });
       setUser(updatedUser);
       setName(updatedUser.full_name || "");
       setPhone(updatedUser.phone || "");
@@ -42,7 +52,7 @@ export default function Profile() {
   };
 
   return (
-    <DashboardLayout role="customer" navItems={NAV} title="Customer Panel">
+    <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
       <h1 className="font-heading text-2xl font-bold tracking-tight">My Profile</h1>
       <p className="mt-1 text-sm text-muted-foreground">Manage your account information.</p>
 
@@ -59,22 +69,24 @@ export default function Profile() {
 
         <form onSubmit={handleSave} className="mt-6 space-y-4">
           <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium"><User className="h-4 w-4 text-primary" /> Full Name</label>
+            <label className="flex items-center gap-1.5 text-sm font-medium"><User className="h-4 w-4 text-primary" /> Full Name <span className="text-destructive">*</span></label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={120}
+              required
               placeholder="Enter your full name"
               className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium"><Phone className="h-4 w-4 text-primary" /> Phone Number</label>
+            <label className="flex items-center gap-1.5 text-sm font-medium"><Phone className="h-4 w-4 text-primary" /> Phone Number <span className="text-destructive">*</span></label>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               maxLength={32}
               inputMode="tel"
+              required
               placeholder="Enter your phone number"
               className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />

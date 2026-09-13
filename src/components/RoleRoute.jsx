@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { authClient } from "@/api/authClient";
+import { COMPLETE_PROFILE_PATH, isProfileComplete } from "@/lib/profile";
 
 export default function RoleRoute({ allowedRoles, children }) {
   const [user, setUser] = useState(null);
@@ -24,6 +25,14 @@ export default function RoleRoute({ allowedRoles, children }) {
   if (!user) {
     const returnTo = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/login?returnTo=${returnTo}`} replace />;
+  }
+
+  // Sign-up only collects an email and a password. Until the account has a name
+  // and a phone number, every guarded page bounces to the completion form and
+  // comes back here afterwards.
+  if (!isProfileComplete(user)) {
+    const returnTo = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`${COMPLETE_PROFILE_PATH}?returnTo=${returnTo}`} replace />;
   }
 
   if (!allowedRoles.includes(user.role)) {

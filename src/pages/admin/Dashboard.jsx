@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CalendarCheck, IndianRupee, TrendingDown, TrendingUp, Package, ArrowRight, Receipt } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { adminClient } from "@/api/adminClient";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard, CalendarDays, Sparkles, Users, UserCog, Receipt as ReceiptIcon, BarChart3, Settings, Ticket } from "lucide-react";
 
@@ -18,44 +18,28 @@ const NAV = [
 ];
 
 export default function AdminDashboard() {
-  const [bookings, setBookings] = useState([]);
-  const [expenses, setExpenses] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Totals are aggregated by MySQL rather than by pulling every booking and
+  // expense into the browser and reducing over them.
   useEffect(() => {
-    Promise.all([
-      base44.entities.Booking.list("-created_date", 10000),
-      base44.entities.Expense.list("-created_date", 10000),
-    ]).then(([b, e]) => {
-      setBookings(b);
-      setExpenses(e);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    adminClient.getDashboard()
+      .then((data) => { setStats(data.stats); setRecent(data.recent); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const today = new Date().toISOString().split("T")[0];
-
-  const stats = useMemo(() => {
-    const todaysBookings = bookings.filter((b) => b.pickup_date === today);
-    const todaysRevenue = bookings
-      .filter((b) => b.amount_set && b.pickup_date === today)
-      .reduce((sum, b) => sum + (b.final_amount || 0), 0);
-    const todaysExpenses = expenses
-      .filter((e) => e.date === today)
-      .reduce((sum, e) => sum + (e.amount || 0), 0);
-    const activeBookings = bookings.filter((b) => !["Delivered", "Cancelled"].includes(b.status)).length;
-    return { todaysBookings: todaysBookings.length, todaysRevenue, todaysExpenses, profit: todaysRevenue - todaysExpenses, activeBookings };
-  }, [bookings, expenses, today]);
+  const money = (value) => `₹${Number(value || 0).toLocaleString()}`;
 
   const cards = [
-    { label: "Today's Bookings", value: stats.todaysBookings, icon: CalendarCheck, color: "text-primary", bg: "bg-primary/10" },
-    { label: "Today's Revenue", value: `₹${stats.todaysRevenue.toLocaleString()}`, icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { label: "Today's Expenses", value: `₹${stats.todaysExpenses.toLocaleString()}`, icon: TrendingDown, color: "text-red-600", bg: "bg-red-50" },
-    { label: "Today's Profit", value: `₹${stats.profit.toLocaleString()}`, icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
-    { label: "Active Bookings", value: stats.activeBookings, icon: Package, color: "text-indigo-600", bg: "bg-indigo-50" },
+    { label: "Today's Bookings", value: stats?.todays_bookings ?? 0, icon: CalendarCheck, color: "text-primary", bg: "bg-primary/10" },
+    { label: "Today's Revenue", value: money(stats?.todays_revenue), icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: "Today's Expenses", value: money(stats?.todays_expenses), icon: TrendingDown, color: "text-red-600", bg: "bg-red-50" },
+    { label: "Today's Profit", value: money(stats?.profit), icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
+    { label: "Active Bookings", value: stats?.active_bookings ?? 0, icon: Package, color: "text-indigo-600", bg: "bg-indigo-50" },
   ];
-
-  const recent = bookings.slice(0, 6);
 
   return (
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">

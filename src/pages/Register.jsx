@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
-import { safeReturnTo } from "@/lib/authReturnTo";
+import { safeReturnTo, roleHome } from "@/lib/authReturnTo";
+import { COMPLETE_PROFILE_PATH, isProfileComplete } from "@/lib/profile";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -28,8 +29,12 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await authClient.signup({ email: email.trim().toLowerCase(), password });
-      window.location.href = safeReturnTo();
+      const user = await authClient.signup({ email: email.trim().toLowerCase(), password });
+      const destination = safeReturnTo() || roleHome(user.role);
+      // A new account has no name or phone yet, so this is always the next step.
+      window.location.href = isProfileComplete(user)
+        ? destination
+        : `${COMPLETE_PROFILE_PATH}?returnTo=${encodeURIComponent(destination)}`;
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
@@ -46,7 +51,7 @@ export default function Register() {
         <>
           Already have an account?{" "}
           <Link
-            to={"/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
+            to={"/login" + (safeReturnTo() ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
             className="text-primary font-medium hover:underline"
           >
             Log in

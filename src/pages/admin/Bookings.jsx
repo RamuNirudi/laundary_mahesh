@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Search, X, User, Phone, MapPin, Calendar, Clock, IndianRupee, Save, UserCog, CheckCircle2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { Search, X, User, Phone, MapPin, Calendar, Clock, IndianRupee, Save, UserCog } from "lucide-react";
+import { adminClient } from "@/api/adminClient";
 import { toast } from "@/components/ui/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import StatusTracker from "@/components/StatusTracker";
@@ -30,16 +30,17 @@ export default function AdminBookings() {
   const [dateFilter, setDateFilter] = useState("All");
   const [selected, setSelected] = useState(null);
 
-  useEffect(() => {
-    Promise.all([
-      base44.entities.Booking.list("-created_date", 10000),
-      base44.entities.User.filter({ role: "service_boy" }),
-    ]).then(([b, sb]) => {
-      setBookings(b);
-      setServiceBoys(sb);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+  const load = () => Promise.all([
+    adminClient.getBookings(),
+    adminClient.getServiceBoys(),
+  ]).then(([b, sb]) => {
+    setBookings(b);
+    setServiceBoys(sb.filter((member) => member.active));
+  }).catch((err) => {
+    toast({ title: "Failed to load bookings", description: err.message, variant: "destructive" });
+  }).finally(() => setLoading(false));
+
+  useEffect(() => { load(); }, []);
 
   const filtered = useMemo(() => {
     const now = new Date();
@@ -137,59 +138,37 @@ export default function AdminBookings() {
         )}
       </div>
 
-      {selected && <BookingModal booking={selected} serviceBoys={serviceBoys} onClose={() => setSelected(null)} />}
+      {selected && <BookingModal booking={selected} serviceBoys={serviceBoys} onClose={() => setSelected(null)} onSaved={load} />}
     </DashboardLayout>
   );
 }
 
-function BookingModal({ booking, serviceBoys, onClose }) {
+function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
   const [status, setStatus] = useState(booking.status);
   const [serviceBoyId, setServiceBoyId] = useState(booking.service_boy_id || "");
   const [servicePrice, setServicePrice] = useState(booking.service_price || 0);
   const [additionalCharges, setAdditionalCharges] = useState(booking.additional_charges || 0);
   const [discount, setDiscount] = useState(booking.discount || 0);
-  const [coupon, setCoupon] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (booking.coupon_code) {
-      base44.entities.Coupon.filter({}, "-created_date", 500).then((all) => {
-        const found = all.find((c) => (c.code || "").toUpperCase() === booking.coupon_code.toUpperCase());
-        if (found) setCoupon(found);
-      }).catch(() => {});
-    }
-  }, [booking.coupon_code]);
-
+  // Preview only. The server re-prices the coupon against the saved subtotal and
+  // its answer is what gets stored.
   const subtotal = (Number(servicePrice) || 0) + (Number(additionalCharges) || 0);
-  let couponDiscount = 0;
-  if (coupon && subtotal > 0) {
-    if (coupon.min_order_amount > 0 && subtotal < coupon.min_order_amount) {
-      couponDiscount = 0;
-    } else if (coupon.discount_type === "percentage") {
-      couponDiscount = Math.round(subtotal * (coupon.discount_value / 100) * 100) / 100;
-    } else {
-      couponDiscount = Math.min(coupon.discount_value, subtotal);
-    }
-  }
+  const couponDiscount = Number(booking.coupon_discount) || 0;
   const finalAmount = subtotal - (Number(discount) || 0) - couponDiscount;
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const sb = serviceBoys.find((s) => s.id === serviceBoyId);
-      const update = {
-        booking_id: booking.id,
+      await adminClient.updateBooking(booking.id, {
         status,
-        service_boy_id: serviceBoyId || undefined,
-        service_boy_name: sb ? sb.full_name : undefined,
+        service_boy_id: serviceBoyId || "",
         service_price: Number(servicePrice) || 0,
         additional_charges: Number(additionalCharges) || 0,
         discount: Number(discount) || 0,
-        coupon_discount: couponDiscount,
-        final_amount: finalAmount,
-      };
-      await base44.functions.invoke("updateBookingStatus", update);
-      toast({ title: "Booking updated", description: "Status and amount saved. Email sent if applicable." });
+      });
+      toast({ title: "Booking updated", description: "Status and amount saved. The customer has been emailed." });
+      await onSaved();
       onClose();
     } catch (err) {
       toast({ title: "Update failed", description: err.message, variant: "destructive" });
@@ -200,8 +179,9 @@ function BookingModal({ booking, serviceBoys, onClose }) {
   const handleCancel = async () => {
     setSaving(true);
     try {
-      await base44.functions.invoke("updateBookingStatus", { booking_id: booking.id, status: "Cancelled" });
+      await adminClient.updateBooking(booking.id, { status: "Cancelled" });
       toast({ title: "Booking cancelled" });
+      await onSaved();
       onClose();
     } catch (err) {
       toast({ title: "Cancel failed", description: err.message, variant: "destructive" });
@@ -279,16 +259,14 @@ function BookingModal({ booking, serviceBoys, onClose }) {
               <input type="number" min="0" value={discount} onChange={(e) => setDiscount(e.target.value)} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary" />
             </div>
           </div>
-          {coupon && (
+          {booking.coupon_code && (
             <div className="mt-3 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-green-800">Coupon: {coupon.code}</span>
+                <span className="text-sm font-semibold text-green-800">Coupon: {booking.coupon_code}</span>
                 <span className="text-sm font-bold text-green-700">−₹{couponDiscount}</span>
               </div>
               <p className="mt-0.5 text-xs text-green-600">
-                {coupon.discount_type === "percentage" ? `${coupon.discount_value}% off` : `₹${coupon.discount_value} flat off`}
-                {coupon.min_order_amount > 0 && ` · Min order ₹${coupon.min_order_amount}`}
-                {coupon.min_order_amount > 0 && subtotal < coupon.min_order_amount && " (min not met)"}
+                Recalculated by the server against the saved subtotal when you save.
               </p>
             </div>
           )}

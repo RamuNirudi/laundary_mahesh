@@ -31,7 +31,7 @@ export default function MyBookings() {
   });
 
   return (
-    <DashboardLayout role="customer" navItems={NAV} title="Customer Panel">
+    <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold tracking-tight">My Bookings</h1>
         <p className="mt-1 text-sm text-muted-foreground">Track and manage all your laundry bookings.</p>

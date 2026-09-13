@@ -7,15 +7,16 @@ import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
-import { safeReturnTo } from "@/lib/authReturnTo";
+import { safeReturnTo, roleHome } from "@/lib/authReturnTo";
+import { COMPLETE_PROFILE_PATH, isProfileComplete } from "@/lib/profile";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  // Post-login destination (e.g. the MCP OAuth consent page sends users here
-  // with returnTo so the grant flow can resume). Same-origin paths only.
+  // An explicit ?returnTo= (e.g. a guard bounced the user here) wins; otherwise
+  // customers land on the homepage and staff on their own portal.
   const returnTo = safeReturnTo();
 
   const handleSubmit = async (e) => {
@@ -23,8 +24,12 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await authClient.login(email.trim().toLowerCase(), password);
-      window.location.href = returnTo;
+      const user = await authClient.login(email.trim().toLowerCase(), password);
+      // Sign-up never asked for a name or a phone number. Send first-time users
+      // straight to the completion form; the guards enforce it either way.
+      window.location.href = isProfileComplete(user)
+        ? returnTo || roleHome(user.role)
+        : `${COMPLETE_PROFILE_PATH}?returnTo=${encodeURIComponent(returnTo || roleHome(user.role))}`;
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -45,7 +50,7 @@ export default function Login() {
         <>
           Don't have an account?{" "}
           <Link
-            to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")}
+            to={"/register" + (returnTo ? "?returnTo=" + encodeURIComponent(returnTo) : "")}
             className="text-primary font-medium hover:underline"
           >
             Create one

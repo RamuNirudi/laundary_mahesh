@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Search, Phone, Mail, Calendar } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { adminClient } from "@/api/adminClient";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LayoutDashboard, CalendarDays, Sparkles, Users, UserCog, Receipt, BarChart3, Settings, Ticket } from "lucide-react";
 
@@ -18,18 +18,17 @@ const NAV = [
 
 export default function AdminCustomers() {
   const [users, setUsers] = useState([]);
-  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  // The API returns each customer with their booking count and lifetime spend
+  // already aggregated, so the page no longer downloads every booking to count.
   useEffect(() => {
-    Promise.all([
-      base44.entities.User.filter({ role: "customer" }),
-      base44.entities.Booking.list("-created_date", 10000),
-    ]).then(([u, b]) => { setUsers(u); setBookings(b); setLoading(false); }).catch(() => setLoading(false));
+    adminClient.getCustomers()
+      .then(setUsers)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
-
-  const bookingCount = (userId) => bookings.filter((b) => b.customer_id === userId).length;
 
   const filtered = users.filter((u) => !search || (u.full_name || "").toLowerCase().includes(search.toLowerCase()) || (u.email || "").toLowerCase().includes(search.toLowerCase()));
 
@@ -62,7 +61,8 @@ export default function AdminCustomers() {
               </div>
               <div className="mt-4 space-y-1.5 text-sm">
                 {u.phone && <p className="flex items-center gap-2 text-muted-foreground"><Phone className="h-3.5 w-3.5" /> {u.phone}</p>}
-                <p className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> {bookingCount(u.id)} bookings</p>
+                <p className="flex items-center gap-2 text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> {u.booking_count} booking{u.booking_count === 1 ? "" : "s"}</p>
+                <p className="flex items-center gap-2 text-muted-foreground"><Mail className="h-3.5 w-3.5" /> ₹{u.total_spent.toLocaleString()} lifetime</p>
               </div>
             </div>
           ))}

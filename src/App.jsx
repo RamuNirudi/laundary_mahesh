@@ -8,12 +8,14 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import RoleRoute from '@/components/RoleRoute';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Auth pages
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import CompleteProfile from '@/pages/CompleteProfile';
 
 // Public pages
 import Home from '@/pages/Home';
@@ -77,15 +79,19 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
+      {/* Mandatory profile completion for brand-new accounts. Guarded routes
+          bounce here until a full name and phone number are on file. */}
+      <Route path="/complete-profile" element={<CompleteProfile />} />
+
       {/* Booking (customer) */}
-      <Route path="/book" element={<RoleRoute allowedRoles={["customer", "admin"]}><Book /></RoleRoute>} />
+      <Route path="/book" element={<RoleRoute allowedRoles={["customer"]}><Book /></RoleRoute>} />
 
       {/* Customer dashboard */}
-      <Route path="/dashboard" element={<RoleRoute allowedRoles={["customer", "admin"]}><CustomerDashboard /></RoleRoute>} />
-      <Route path="/dashboard/bookings" element={<RoleRoute allowedRoles={["customer", "admin"]}><MyBookings /></RoleRoute>} />
-      <Route path="/dashboard/bookings/:id" element={<RoleRoute allowedRoles={["customer", "admin"]}><BookingDetail /></RoleRoute>} />
-      <Route path="/dashboard/profile" element={<RoleRoute allowedRoles={["customer", "admin"]}><Profile /></RoleRoute>} />
-      <Route path="/dashboard/address" element={<RoleRoute allowedRoles={["customer", "admin"]}><MyAddress /></RoleRoute>} />
+      <Route path="/dashboard" element={<RoleRoute allowedRoles={["customer"]}><CustomerDashboard /></RoleRoute>} />
+      <Route path="/dashboard/bookings" element={<RoleRoute allowedRoles={["customer"]}><MyBookings /></RoleRoute>} />
+      <Route path="/dashboard/bookings/:id" element={<RoleRoute allowedRoles={["customer"]}><BookingDetail /></RoleRoute>} />
+      <Route path="/dashboard/profile" element={<RoleRoute allowedRoles={["customer"]}><Profile /></RoleRoute>} />
+      <Route path="/dashboard/address" element={<RoleRoute allowedRoles={["customer"]}><MyAddress /></RoleRoute>} />
 
       {/* Admin dashboard */}
       <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminDashboard /></RoleRoute>} />
@@ -115,7 +121,9 @@ function App() {
         <QueryClientProvider client={queryClientInstance}>
           <Router>
             <ScrollToTop />
-            <AuthenticatedApp />
+            <ErrorBoundary>
+              <AuthenticatedApp />
+            </ErrorBoundary>
           </Router>
           <Toaster />
         </QueryClientProvider>

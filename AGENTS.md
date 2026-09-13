@@ -2,33 +2,41 @@
 
 ## Project Context
 
-This is a Base44 app repository. Treat it as user-owned application code, keep changes focused on the user's request, and preserve existing project conventions.
+Star Laundrovamat: a React (Vite) frontend on a custom Node.js + MySQL backend.
+Treat it as user-owned application code, keep changes focused on the request,
+and preserve existing conventions.
 
-Start with `README.md` for local setup, environment variables, and publish workflow.
-
-## Base44 References
-
-- CLI overview: https://docs.base44.com/developers/references/cli/get-started/overview.md
-- Agent skills: https://docs.base44.com/developers/backend/overview/skills.md
-
-If your agent supports Agent Skills, install or update Base44 skills before Base44-specific work:
-
-```bash
-npx skills add base44/skills
-```
+This app **does not use Base44**. There is no Base44 SDK, CLI, or hosted
+backend — do not reintroduce `@base44/*` packages, `base44 dev`, or
+`base44.entities.*` / `base44.functions.invoke` calls. Start with `README.md`
+for setup, the API surface, and the database design.
 
 ## Key Files
 
-- `src/`: frontend application source.
-- `src/api/base44Client.js`: frontend Base44 SDK client.
-- `vite.config.js`: Vite config and Base44 Vite plugin setup.
-- `.env.local`: local-only environment values; never commit secrets.
+- `server/index.js` — HTTP server and routing.
+- `server/lib/` — config, pool, schema/migrations, auth, coupons, mail, helpers.
+- `server/routes/` — one module per domain.
+- `server/schema.sql` — canonical MySQL DDL.
+- `src/api/` — `client.js` (fetch wrapper), `authClient.js`, `adminClient.js`.
+- `src/pages/admin/` — admin panel; `src/pages/customer/`, `src/pages/serviceboy/`.
+- `.env` — local secrets, gitignored. Never commit it.
 
 ## Working Notes
 
-- Use `base44 dev` as the default local development command when you need the local Base44 backend. It can run the backend and frontend together.
-- When docs or code mention the frontend being started automatically, that usually means the Base44 project config includes `site.serveCommand`, for example `"serveCommand": "npm run dev"` in `base44/config.jsonc`.
-- Use `npm run dev` only for frontend-only work against the hosted Base44 backend.
-- Prefer the existing Base44 CLI workflow over adding new npm scripts for Base44-specific tasks.
-- Reuse the existing SDK client and Vite plugin patterns before adding new Base44 integration paths.
-- Run the relevant checks from `package.json` before finishing code changes.
+- `npm run dev:all` runs the API and frontend together; `npm run server` and
+  `npm run dev` run them separately.
+- The frontend never talks to MySQL. Add a route under `server/routes/`, then a
+  method on the matching client in `src/api/`, then use it in the page.
+- Every route handler calls `requireUser` or `requireRole` itself. There is no
+  path-prefix auth middleware, so a new admin route without a guard is public —
+  always add one.
+- Money and discounts are computed server-side. Prices come from the `services`
+  table, never from the request body; treat any client-sent amount as a preview.
+- Schema changes go in **both** `server/lib/schema.js` (so existing databases
+  migrate on boot) and `server/schema.sql` (so clean installs match).
+- Notification email must never fail a request: use `sendMailInBackground` for
+  anything the user is not directly waiting on.
+- Same for Slack: use `postToSlackInBackground`. `server/lib/slack.js` swallows
+  and logs every failure so an outage can never fail a booking.
+- Run `npm run lint` and `npm run build` before finishing. `npm run typecheck`
+  has pre-existing failures from untyped shadcn components; it is not a gate.

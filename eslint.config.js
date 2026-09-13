@@ -36,6 +36,10 @@ export default [
     },
     rules: {
       "no-unused-vars": "off",
+      // Spreading the recommended configs above drops their `rules` key, so
+      // no-undef has to be re-stated here. Without it a stale reference to a
+      // deleted variable only fails at runtime, blanking the page.
+      "no-undef": "error",
       "react/jsx-uses-vars": "error",
       "react/jsx-uses-react": "error",
       "unused-imports/no-unused-imports": "error",
