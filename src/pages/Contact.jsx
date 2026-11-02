@@ -24,8 +24,8 @@ export default function Contact() {
   };
 
   const contactInfo = [
-    { icon: Phone, label: "Call Us", value: "+91 99999 99999", href: "tel:+919999999999" },
-    { icon: Mail, label: "Email Us", value: "care@starlaundrovamat.com", href: "mailto:care@starlaundrovamat.com" },
+    { icon: Phone, label: "Call Us", value: "+91 86396 67975", href: "tel:+91 86396 67975" },
+    { icon: Mail, label: "Email Us", value: "starlaundrovamat@gmail.com", href: "mailto:starlaundrovamat@gmail.com" },
     { icon: MapPin, label: "Service Area", value: "Available across the city" },
     { icon: Clock, label: "Hours", value: "Mon–Sun, 8am–8pm" },
   ];
