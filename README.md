@@ -221,5 +221,3 @@ succeeds. With `SLACK_WEBHOOK_URL` unset the whole integration is a no-op.
 - Sessions are bearer tokens in `localStorage` with a 7-day expiry. Deactivating
   an account revokes access immediately, since every request re-reads the user.
 =======
-# laundary_mahesh
->>>>>>> a761804c1073226efa2af78ded727c8c1d3a285d
