@@ -31,41 +31,43 @@ export default function Services() {
     <div className="min-h-screen bg-background">
       <PublicNavbar />
 
-      <section className="relative overflow-hidden pt-28 pb-12 lg:pt-36">
+      <section className="relative overflow-hidden pb-14 pt-32 lg:pt-40">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-secondary/60 via-background to-background" />
-          <div className="absolute right-[-5%] top-[10%] h-[400px] w-[400px] rounded-full bg-primary/8 blur-3xl animate-aurora" />
+          <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background" />
+          <div className="absolute right-[-6%] top-[8%] h-[30rem] w-[30rem] animate-aurora rounded-full bg-primary/14 blur-[120px]" />
+          <div className="absolute left-[-6%] top-[30%] h-[24rem] w-[24rem] animate-aurora rounded-full bg-accent/12 blur-[120px]" style={{ animationDelay: "-9s" }} />
         </div>
+        <div className="absolute inset-0 -z-10 bg-grid bg-grid-fade opacity-50" />
+
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Our Services</p>
-            <h1 className="mt-3 font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Premium care for <span className="text-gradient">every garment</span></h1>
-            <p className="mt-4 text-lg text-muted-foreground">From everyday laundry to specialty saree care — we handle it all with precision.</p>
+          <div className="animate-fade-up mx-auto max-w-2xl text-center">
+            <p className="eyebrow">Our Services</p>
+            <h1 className="mt-4 text-balance font-heading text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+              Premium care for <span className="text-gradient">every garment</span>
+            </h1>
+            <p className="mt-5 text-lg text-muted-foreground">From everyday laundry to specialty saree care — we handle it all with precision.</p>
           </div>
 
-          <div className="mx-auto mt-10 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="animate-fade-up stagger-2 mx-auto mt-12 max-w-md">
+            <div className="group relative">
+              <div className="absolute -inset-1 rounded-full bg-gradient-brand opacity-0 blur transition-opacity duration-500 group-focus-within:opacity-30" />
+              <Search className="absolute left-5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search services..."
-                className="w-full rounded-full border border-border bg-card/80 py-3 pl-11 pr-4 text-sm outline-none backdrop-blur-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="relative h-12 w-full rounded-full border border-border bg-card/70 pl-12 pr-5 text-sm outline-none backdrop-blur-md transition-all duration-300 placeholder:text-muted-foreground/70 focus:border-primary/60 focus:ring-4 focus:ring-primary/15"
               />
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <div className="animate-fade-up stagger-3 mt-7 flex flex-wrap justify-center gap-2">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                  category === cat
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
-                }`}
+                className={`chip ${category === cat ? "chip-active" : "chip-idle"}`}
               >
                 {cat}
               </button>
@@ -79,11 +81,17 @@ export default function Services() {
           {loading ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-72 animate-pulse rounded-2xl border border-border bg-secondary/50" />
+                <div key={i} className="skeleton h-80 rounded-2xl border border-border" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="py-20 text-center text-muted-foreground">No services found. Try a different search.</div>
+            <div className="surface mx-auto max-w-md rounded-2xl px-8 py-16 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/8 text-primary">
+                <Search className="h-6 w-6" />
+              </div>
+              <p className="mt-5 font-heading text-lg font-bold">No services found</p>
+              <p className="mt-2 text-sm text-muted-foreground">Try a different search term or category.</p>
+            </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {filtered.map((s) => (

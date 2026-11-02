@@ -35,23 +35,24 @@ export default function AdminCustomers() {
   return (
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">Customers</h1>
+        <p className="eyebrow">Directory</p>
+        <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Customers</h1>
         <p className="mt-1 text-sm text-muted-foreground">All registered customers.</p>
       </div>
 
       <div className="mb-5 relative max-w-md">
         <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search customers..." className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search customers..." className="field w-full pl-10" />
       </div>
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((i) => <div key={i} className="h-32 animate-pulse rounded-2xl bg-secondary/50" />)}</div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((i) => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
       ) : filtered.length === 0 ? (
         <div className="p-12 text-center text-sm text-muted-foreground">No customers found.</div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((u) => (
-            <div key={u.id} className="rounded-2xl border border-border bg-card p-5">
+            <div key={u.id} className="surface edge-light rounded-2xl p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-lg font-bold text-primary">{(u.full_name || "U").charAt(0).toUpperCase()}</div>
                 <div className="min-w-0">

@@ -54,33 +54,36 @@ export default function ServiceBoyDashboard() {
 
   return (
     <DashboardLayout role="service_boy" navItems={NAV} title="Service Boy">
-      <div className="mb-8">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">Today's Pickups</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</p>
+      <div className="mb-10">
+        <p className="eyebrow">Route</p>
+        <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Today's Pickups</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</p>
       </div>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Truck className="h-5 w-5" /></div>
-          <p className="mt-4 font-heading text-2xl font-bold">{todaysPickups.length}</p>
-          <p className="text-sm text-muted-foreground">Today's Pickups</p>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600"><PackageCheck className="h-5 w-5" /></div>
-          <p className="mt-4 font-heading text-2xl font-bold">{allActive.length}</p>
-          <p className="text-sm text-muted-foreground">Active Assignments</p>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><CheckCircle2 className="h-5 w-5" /></div>
-          <p className="mt-4 font-heading text-2xl font-bold">{bookings.filter((b) => b.status === "Delivered").length}</p>
-          <p className="text-sm text-muted-foreground">Delivered</p>
-        </div>
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        {[
+          { icon: Truck, tile: "tile-primary", value: todaysPickups.length, label: "Today's Pickups" },
+          { icon: PackageCheck, tile: "tile-indigo", value: allActive.length, label: "Active Assignments" },
+          { icon: CheckCircle2, tile: "tile-success", value: bookings.filter((b) => b.status === "Delivered").length, label: "Delivered" },
+        ].map((card, i) => {
+          const Icon = card.icon;
+          return (
+            <div key={card.label} className={`stat-tile animate-fade-up stagger-${i + 1}`}>
+              <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-primary/8 blur-2xl" />
+              <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl ${card.tile}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <p className="relative mt-5 font-heading text-4xl font-bold tracking-tight tabular">{card.value}</p>
+              <p className="relative mt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{card.label}</p>
+            </div>
+          );
+        })}
       </div>
 
       {loading ? (
-        <div className="space-y-3">{[1,2,3].map((i) => <div key={i} className="h-32 animate-pulse rounded-2xl bg-secondary/50" />)}</div>
+        <div className="space-y-3">{[1,2,3].map((i) => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
       ) : allActive.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-card p-12 text-center">
+        <div className="surface edge-light rounded-2xl p-12 text-center">
           <Truck className="mx-auto h-10 w-10 text-muted-foreground/40" />
           <p className="mt-3 text-sm font-medium">No active assignments</p>
           <p className="mt-1 text-sm text-muted-foreground">You'll see your assigned pickups here.</p>
@@ -88,12 +91,12 @@ export default function ServiceBoyDashboard() {
       ) : (
         <div className="space-y-4">
           {allActive.map((b) => (
-            <div key={b.id} className="rounded-2xl border border-border bg-card p-5">
+            <div key={b.id} className="surface edge-light rounded-2xl p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-heading text-base font-semibold">{b.booking_id}</p>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(b.status)}`}>{b.status}</span>
+                    <span className={statusColor(b.status)}>{b.status}</span>
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <div className="flex items-center gap-2 text-sm"><User className="h-4 w-4 shrink-0 text-primary" /><div><p className="text-xs text-muted-foreground">Customer</p><p className="font-medium">{b.customer_name}</p></div></div>
@@ -135,14 +138,14 @@ export default function ServiceBoyDashboard() {
 
 function statusColor(status) {
   const map = {
-    "Booking Requested": "bg-amber-50 text-amber-700",
-    "Booking Confirmed": "bg-blue-50 text-blue-700",
-    "Service Boy Assigned": "bg-indigo-50 text-indigo-700",
-    "Clothes Picked Up": "bg-cyan-50 text-cyan-700",
-    "Cleaning in Progress": "bg-violet-50 text-violet-700",
-    "Ready for Delivery": "bg-teal-50 text-teal-700",
-    "Delivered": "bg-emerald-50 text-emerald-700",
-    "Cancelled": "bg-red-50 text-red-700",
+    "Booking Requested": "status-requested",
+    "Booking Confirmed": "status-confirmed",
+    "Service Boy Assigned": "status-assigned",
+    "Clothes Picked Up": "status-pickedup",
+    "Cleaning in Progress": "status-cleaning",
+    "Ready for Delivery": "status-ready",
+    "Delivered": "status-delivered",
+    "Cancelled": "status-cancelled",
   };
-  return map[status] || "bg-secondary text-muted-foreground";
+  return `status-pill ${map[status] || "status-neutral"}`;
 }

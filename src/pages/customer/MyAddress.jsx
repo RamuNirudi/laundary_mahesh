@@ -34,19 +34,20 @@ export default function MyAddress() {
 
   return (
     <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
-      <h1 className="font-heading text-2xl font-bold tracking-tight">My Address</h1>
+      <p className="eyebrow">Account</p>
+      <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">My Address</h1>
       <p className="mt-1 text-sm text-muted-foreground">Save your default pickup address for faster booking.</p>
 
-      <form onSubmit={handleSave} className="mt-8 max-w-lg rounded-2xl border border-border bg-card p-6">
+      <form onSubmit={handleSave} className="mt-8 max-w-lg surface edge-light rounded-2xl p-6">
         <label className="flex items-center gap-1.5 text-sm font-medium"><MapPin className="h-4 w-4 text-primary" /> Default Pickup Address</label>
         <textarea
           rows={4}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           placeholder="House no, street, area, city, pincode"
-          className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="field-area mt-2"
         />
-        <button type="submit" disabled={saving} className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
+        <button type="submit" disabled={saving} className="mt-4 shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none">
           <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Address"}
         </button>
       </form>

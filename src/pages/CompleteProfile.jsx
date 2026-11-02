@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { UserCheck, User, Phone, Loader2 } from "lucide-react";
+import { User, Phone, Loader2 } from "lucide-react";
 import { authClient } from "@/api/authClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,6 @@ export default function CompleteProfile() {
 
   return (
     <AuthLayout
-      icon={UserCheck}
       title="Complete your profile"
       subtitle="We need a few details before you can continue"
       footer={<>Signed in as {user.email}</>}
@@ -123,7 +122,7 @@ export default function CompleteProfile() {
           </p>
         </div>
 
-        <Button type="submit" disabled={saving} className="w-full h-12">
+        <Button type="submit" disabled={saving} className="w-full h-11">
           {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           {saving ? "Saving..." : "Save and continue"}
         </Button>

@@ -85,27 +85,28 @@ export default function BusinessReport() {
   };
 
   const cards = [
-    { label: "Total Bookings", value: stats.totalBookings, icon: Package, color: "text-primary", bg: "bg-primary/10" },
-    { label: "Total Revenue", value: `₹${stats.revenue.toLocaleString()}`, icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { label: "Total Expenses", value: `₹${stats.totalExpenses.toLocaleString()}`, icon: TrendingDown, color: "text-red-600", bg: "bg-red-50" },
+    { label: "Total Bookings", value: stats.totalBookings, icon: Package, tile: "tile-primary" },
+    { label: "Total Revenue", value: `₹${stats.revenue.toLocaleString()}`, icon: IndianRupee, tile: "tile-success" },
+    { label: "Total Expenses", value: `₹${stats.totalExpenses.toLocaleString()}`, icon: TrendingDown, tile: "tile-danger" },
     { label: "Total Profit", value: `₹${stats.profit.toLocaleString()}`, icon: TrendingUp, color: stats.profit >= 0 ? "text-accent" : "text-destructive", bg: stats.profit >= 0 ? "bg-accent/10" : "bg-destructive/10" },
   ];
 
   return (
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">Business Report</h1>
+        <p className="eyebrow">Analytics</p>
+        <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Business Report</h1>
         <p className="mt-1 text-sm text-muted-foreground">Track revenue, expenses, and profit across time periods.</p>
       </div>
 
       <div className="mb-6 space-y-3">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {FILTERS.map((f) => (
-            <button key={f} onClick={() => setFilter(f)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${filter === f ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:bg-secondary"}`}>{f}</button>
+            <button key={f} onClick={() => setFilter(f)} className={`chip shrink-0 ${filter === f ? "chip-active" : "chip-idle"}`}>{f}</button>
           ))}
         </div>
 
-        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3 surface edge-light rounded-2xl p-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-wrap items-end gap-3">
             <div>
               <label className="text-xs font-medium text-muted-foreground">From Date</label>
@@ -147,8 +148,8 @@ export default function BusinessReport() {
         {cards.map((c) => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="rounded-2xl border border-border bg-card p-5">
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${c.bg} ${c.color}`}>
+            <div key={c.label} className="surface edge-light rounded-2xl p-5">
+              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${c.tile}`}>
                 <Icon className="h-5 w-5" />
               </div>
               <p className="mt-4 font-heading text-2xl font-bold">{loading ? "—" : c.value}</p>
@@ -161,18 +162,18 @@ export default function BusinessReport() {
       <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-6">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          <h2 className="font-heading text-lg font-semibold">Profit Summary</h2>
+          <h2 className="font-heading text-lg font-bold tracking-tight">Profit Summary</h2>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl bg-card p-4">
+          <div className="rounded-xl border border-border/70 bg-secondary/40 p-4">
             <p className="text-xs text-muted-foreground">Revenue</p>
             <p className="mt-1 font-heading text-xl font-bold text-emerald-600">₹{stats.revenue.toLocaleString()}</p>
           </div>
-          <div className="rounded-xl bg-card p-4">
+          <div className="rounded-xl border border-border/70 bg-secondary/40 p-4">
             <p className="text-xs text-muted-foreground">Expenses</p>
             <p className="mt-1 font-heading text-xl font-bold text-red-600">₹{stats.totalExpenses.toLocaleString()}</p>
           </div>
-          <div className="rounded-xl bg-card p-4">
+          <div className="rounded-xl border border-border/70 bg-secondary/40 p-4">
             <p className="text-xs text-muted-foreground">Profit (Revenue − Expenses)</p>
             <p className={`mt-1 font-heading text-xl font-bold ${stats.profit >= 0 ? "text-primary" : "text-destructive"}`}>₹{stats.profit.toLocaleString()}</p>
           </div>
@@ -186,8 +187,8 @@ export default function BusinessReport() {
 
       {report?.top_services?.length > 0 && (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <h2 className="font-heading text-lg font-semibold">Top Services</h2>
+          <div className="surface edge-light rounded-2xl p-6">
+            <h2 className="font-heading text-lg font-bold tracking-tight">Top Services</h2>
             <div className="mt-4 divide-y divide-border">
               {report.top_services.map((s) => (
                 <div key={s.service_name} className="flex items-center justify-between py-2.5">
@@ -201,8 +202,8 @@ export default function BusinessReport() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <h2 className="font-heading text-lg font-semibold">Coupon Usage</h2>
+          <div className="surface edge-light rounded-2xl p-6">
+            <h2 className="font-heading text-lg font-bold tracking-tight">Coupon Usage</h2>
             {report.coupon_usage.length === 0 ? (
               <p className="mt-8 text-center text-sm text-muted-foreground">No coupons redeemed in this period.</p>
             ) : (

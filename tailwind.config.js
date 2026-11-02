@@ -5,10 +5,26 @@ module.exports = {
   theme: {
   	extend: {
   		opacity: Object.fromEntries(Array.from({ length: 101 }, (_, i) => [i, `${i / 100}`])),
+  		screens: {
+  			tall: { raw: '(min-height: 640px)' },
+  			taller: { raw: '(min-height: 800px)' }
+  		},
   		borderRadius: {
+  			'2xl': 'calc(var(--radius) + 8px)',
+  			xl: 'calc(var(--radius) + 4px)',
   			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			md: 'calc(var(--radius) - 4px)',
+  			sm: 'calc(var(--radius) - 8px)'
+  		},
+  		boxShadow: {
+  			'glow-sm': '0 0 18px -6px hsl(var(--primary) / 0.35)',
+  			glow: '0 0 32px -8px hsl(var(--primary) / 0.35)',
+  			'glow-lg': '0 0 64px -12px hsl(var(--primary) / 0.45)',
+  			panel: '0 1px 2px hsl(230 45% 9% / 0.04), 0 12px 32px -16px hsl(230 45% 9% / 0.18)',
+  			lift: '0 24px 48px -20px hsl(var(--primary) / 0.3)'
+  		},
+  		transitionTimingFunction: {
+  			swift: 'cubic-bezier(0.22, 1, 0.36, 1)'
   		},
   		colors: {
   			background: 'hsl(var(--background))',
@@ -40,6 +56,13 @@ module.exports = {
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
+  			},
+  			success: 'hsl(var(--success))',
+  			warning: 'hsl(var(--warning))',
+  			navy: {
+  				DEFAULT: 'hsl(var(--navy))',
+  				foreground: 'hsl(var(--navy-foreground))',
+  				muted: 'hsl(var(--navy-muted))'
   			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',

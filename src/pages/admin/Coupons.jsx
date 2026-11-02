@@ -128,7 +128,7 @@ export default function AdminCoupons() {
           <h1 className="font-heading text-2xl font-bold">Coupons</h1>
           <p className="text-sm text-muted-foreground">Create and manage discount coupons</p>
         </div>
-        <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30">
+        <button onClick={openCreate} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-5 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]">
           <Plus className="h-4 w-4" /> New Coupon
         </button>
       </div>
@@ -138,7 +138,7 @@ export default function AdminCoupons() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search coupons..."
-          className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
+          className="field w-full"
         />
       </div>
 
@@ -154,12 +154,12 @@ export default function AdminCoupons() {
       ) : (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((c) => (
-            <div key={c.id} className="rounded-2xl border border-border bg-card p-5">
+            <div key={c.id} className="surface edge-light rounded-2xl p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-lg bg-primary/10 px-2.5 py-1 font-heading text-sm font-bold text-primary">{c.code}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${c.active ? "bg-green-50 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                    <span className={`status-pill ${c.active ? "flag-on" : "flag-off"}`}>
                       {c.active ? "Active" : "Inactive"}
                     </span>
                   </div>
@@ -192,7 +192,7 @@ export default function AdminCoupons() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/30 backdrop-blur-sm sm:items-center" onClick={() => setShowForm(false)}>
-          <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-card p-6 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+          <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto animate-scale-in rounded-t-3xl border border-border/70 bg-card/95 p-7 shadow-2xl backdrop-blur-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-xl font-bold">{editing ? "Edit Coupon" : "New Coupon"}</h2>
               <button onClick={() => setShowForm(false)} className="rounded-lg p-2 hover:bg-secondary"><X className="h-5 w-5" /></button>
@@ -214,7 +214,7 @@ export default function AdminCoupons() {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="e.g. 10% off for new customers"
-                  className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="field mt-2"
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -236,7 +236,7 @@ export default function AdminCoupons() {
                     min="0"
                     value={form.discount_value}
                     onChange={(e) => setForm({ ...form, discount_value: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function AdminCoupons() {
                     min="0"
                     value={form.min_order_amount}
                     onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
                 <div>
@@ -258,7 +258,7 @@ export default function AdminCoupons() {
                     min="0"
                     value={form.max_discount_amount}
                     onChange={(e) => setForm({ ...form, max_discount_amount: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function AdminCoupons() {
                     min="0"
                     value={form.max_uses}
                     onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
                 <div>
@@ -280,7 +280,7 @@ export default function AdminCoupons() {
                     min="0"
                     value={form.per_user_limit}
                     onChange={(e) => setForm({ ...form, per_user_limit: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
               </div>
@@ -291,7 +291,7 @@ export default function AdminCoupons() {
                     type="date"
                     value={form.valid_from}
                     onChange={(e) => setForm({ ...form, valid_from: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
                 <div>
@@ -300,7 +300,7 @@ export default function AdminCoupons() {
                     type="date"
                     value={form.valid_until}
                     onChange={(e) => setForm({ ...form, valid_until: e.target.value })}
-                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="field mt-2"
                   />
                 </div>
               </div>
@@ -317,7 +317,7 @@ export default function AdminCoupons() {
 
             <div className="mt-6 flex justify-end gap-2">
               <button onClick={() => setShowForm(false)} className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-secondary">Cancel</button>
-              <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
+              <button onClick={handleSave} disabled={saving} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none">
                 {saving ? "Saving..." : <><Save className="h-4 w-4" /> Save Coupon</>}
               </button>
             </div>

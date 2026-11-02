@@ -14,7 +14,10 @@ export default defineConfig({
     // so VITE_API_BASE_URL only has to be set for deployed environments.
     proxy: {
       "/api": {
-        target: process.env.VITE_API_PROXY_TARGET || "http://localhost:3001",
+        // 127.0.0.1 rather than "localhost": Node resolves "localhost" to ::1
+        // first, and anything else bound to [::1]:3001 would swallow the
+        // proxied request before it reached the API.
+        target: process.env.VITE_API_PROXY_TARGET || "http://127.0.0.1:3001",
         changeOrigin: true,
       },
     },

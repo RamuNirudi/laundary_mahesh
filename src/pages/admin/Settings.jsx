@@ -84,17 +84,18 @@ export default function AdminSettings() {
 
   return (
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
-      <h1 className="font-heading text-2xl font-bold tracking-tight">Settings</h1>
+      <p className="eyebrow">Configuration</p>
+      <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Settings</h1>
       <p className="mt-1 text-sm text-muted-foreground">Business and account configuration.</p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="surface edge-light rounded-2xl p-6">
           <div className="flex items-center gap-2">
             <Store className="h-5 w-5 text-primary" />
-            <h2 className="font-heading text-lg font-semibold">Business Info</h2>
+            <h2 className="font-heading text-lg font-bold tracking-tight">Business Info</h2>
           </div>
           {!form ? (
-            <div className="mt-4 space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-10 animate-pulse rounded-xl bg-secondary/50" />)}</div>
+            <div className="mt-4 space-y-3">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-10 rounded-xl" />)}</div>
           ) : (
             <>
               <div className="mt-4 space-y-3">
@@ -104,7 +105,7 @@ export default function AdminSettings() {
                     <input
                       value={form[key] || ""}
                       onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                      className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="field mt-2"
                     />
                   </div>
                 ))}
@@ -112,7 +113,7 @@ export default function AdminSettings() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50"
+                className="mt-5 shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none"
               >
                 {saving ? "Saving..." : <><Save className="h-4 w-4" /> Save Settings</>}
               </button>
@@ -120,8 +121,8 @@ export default function AdminSettings() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-heading text-lg font-semibold">Email Notifications</h2>
+        <div className="surface edge-light rounded-2xl p-6">
+          <h2 className="font-heading text-lg font-bold tracking-tight">Email Notifications</h2>
           <p className="mt-2 text-sm text-muted-foreground">Automatic emails are sent on these events:</p>
           <div className="mt-4 space-y-2">
             {[
@@ -132,7 +133,7 @@ export default function AdminSettings() {
               "Contact form — enquiry to the business inbox",
             ].map((item) => (
               <div key={item} className="flex items-start gap-2 text-sm">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-xs">✓</span>
+                <span className="tile-success mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs">✓</span>
                 <span>{item}</span>
               </div>
             ))}
@@ -143,13 +144,13 @@ export default function AdminSettings() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 lg:col-span-2">
+        <div className="surface edge-light rounded-2xl p-6 lg:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Hash className="h-5 w-5 text-primary" />
-              <h2 className="font-heading text-lg font-semibold">Slack Notifications</h2>
+              <h2 className="font-heading text-lg font-bold tracking-tight">Slack Notifications</h2>
               {slack && (
-                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${slack.configured ? "bg-green-50 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                <span className={`status-pill ${slack.configured ? "flag-on" : "flag-off"}`}>
                   {slack.configured ? "Connected" : "Not configured"}
                 </span>
               )}
@@ -169,10 +170,10 @@ export default function AdminSettings() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 lg:col-span-2">
+        <div className="surface edge-light rounded-2xl p-6 lg:col-span-2">
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-primary" />
-            <h2 className="font-heading text-lg font-semibold">Contact Enquiries</h2>
+            <h2 className="font-heading text-lg font-bold tracking-tight">Contact Enquiries</h2>
             {openEnquiries.length > 0 && (
               <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">{openEnquiries.length} open</span>
             )}
@@ -199,8 +200,8 @@ export default function AdminSettings() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 lg:col-span-2">
-          <h2 className="font-heading text-lg font-semibold">Booking Status Flow</h2>
+        <div className="surface edge-light rounded-2xl p-6 lg:col-span-2">
+          <h2 className="font-heading text-lg font-bold tracking-tight">Booking Status Flow</h2>
           <p className="mt-2 text-sm text-muted-foreground">The standard lifecycle of a booking:</p>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {STATUS_FLOW.map((s, i, arr) => (

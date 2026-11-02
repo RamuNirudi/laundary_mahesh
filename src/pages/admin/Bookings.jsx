@@ -63,7 +63,8 @@ export default function AdminBookings() {
   return (
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">All Bookings</h1>
+        <p className="eyebrow">Operations</p>
+        <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">All Bookings</h1>
         <p className="mt-1 text-sm text-muted-foreground">Manage, assign, and update all customer bookings.</p>
       </div>
 
@@ -74,30 +75,30 @@ export default function AdminBookings() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by ID, name, or phone..."
-            className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field w-full pl-10"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {FILTERS.map((f) => (
-            <button key={f} onClick={() => setDateFilter(f)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${dateFilter === f ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:bg-secondary"}`}>{f}</button>
+            <button key={f} onClick={() => setDateFilter(f)} className={`chip shrink-0 ${dateFilter === f ? "chip-active" : "chip-idle"}`}>{f}</button>
           ))}
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-primary">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="field w-full sm:w-auto">
           <option value="All">All Statuses</option>
           {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="overflow-hidden surface edge-light rounded-2xl">
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3,4].map((i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-secondary/50" />)}</div>
+          <div className="p-6 space-y-3">{[1,2,3,4].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-sm text-muted-foreground">No bookings found.</div>
         ) : (
           <>
             <table className="hidden w-full lg:table">
-              <thead className="border-b border-border bg-secondary/30">
-                <tr className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="border-b border-border/70 bg-secondary/40">
+                <tr className="text-left text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   <th className="px-6 py-3">Booking ID</th>
                   <th className="px-6 py-3">Customer</th>
                   <th className="px-6 py-3">Service</th>
@@ -109,15 +110,15 @@ export default function AdminBookings() {
               </thead>
               <tbody className="divide-y divide-border">
                 {filtered.map((b) => (
-                  <tr key={b.id} className="hover:bg-secondary/20">
+                  <tr key={b.id} className="transition-colors duration-200 hover:bg-primary/5">
                     <td className="px-6 py-4 text-sm font-semibold">{b.booking_id}</td>
                     <td className="px-6 py-4"><p className="text-sm font-medium">{b.customer_name}</p><p className="text-xs text-muted-foreground">{b.customer_phone}</p></td>
                     <td className="px-6 py-4 text-sm text-muted-foreground max-w-[160px] truncate">{(b.services || []).map((s) => s.service_name).join(", ")}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{b.pickup_date}<br /><span className="text-xs">{b.pickup_time}</span></td>
                     <td className="px-6 py-4 text-sm">{b.amount_set ? `₹${b.final_amount}` : <span className="text-muted-foreground">—</span>}</td>
-                    <td className="px-6 py-4"><span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(b.status)}`}>{b.status}</span></td>
+                    <td className="px-6 py-4"><span className={statusColor(b.status)}>{b.status}</span></td>
                     <td className="px-6 py-4 text-right">
-                      <button onClick={() => setSelected(b)} className="rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20">Manage</button>
+                      <button onClick={() => setSelected(b)} className="rounded-full border border-primary/25 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary transition-all duration-300 ease-swift hover:border-primary/50 hover:bg-primary/20 hover:shadow-glow-sm">Manage</button>
                     </td>
                   </tr>
                 ))}
@@ -125,10 +126,10 @@ export default function AdminBookings() {
             </table>
             <div className="lg:hidden divide-y divide-border">
               {filtered.map((b) => (
-                <button key={b.id} onClick={() => setSelected(b)} className="block w-full p-4 text-left hover:bg-secondary/20">
+                <button key={b.id} onClick={() => setSelected(b)} className="block w-full p-4 text-left transition-colors duration-200 hover:bg-primary/5">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">{b.booking_id}</p>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(b.status)}`}>{b.status}</span>
+                    <span className={statusColor(b.status)}>{b.status}</span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{b.customer_name} • {b.pickup_date}</p>
                 </button>
@@ -191,10 +192,10 @@ function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/30 backdrop-blur-sm sm:items-center" onClick={onClose}>
-      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-card p-6 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto animate-scale-in rounded-t-3xl border border-border/70 bg-card/95 p-7 shadow-2xl backdrop-blur-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Manage Booking</p>
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">Manage Booking</p>
             <h2 className="font-heading text-xl font-bold">{booking.booking_id}</h2>
           </div>
           <button onClick={onClose} className="rounded-lg p-2 hover:bg-secondary"><X className="h-5 w-5" /></button>
@@ -211,7 +212,7 @@ function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
 
         {/* Services */}
         <div className="mt-3 rounded-xl border border-border p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Services</p>
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">Services</p>
           <div className="mt-2 space-y-1">
             {(booking.services || []).map((s, i) => (
               <div key={i} className="flex justify-between text-sm"><span>{s.service_name}</span><span className="text-muted-foreground">×{s.quantity}</span></div>
@@ -221,7 +222,7 @@ function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
 
         {/* Status tracker */}
         <div className="mt-3 rounded-xl border border-border p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Current Progress</p>
+          <p className="mb-3 text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">Current Progress</p>
           <StatusTracker status={booking.status} compact />
         </div>
 
@@ -260,17 +261,17 @@ function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
             </div>
           </div>
           {booking.coupon_code && (
-            <div className="mt-3 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5">
+            <div className="mt-3 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-green-800">Coupon: {booking.coupon_code}</span>
-                <span className="text-sm font-bold text-green-700">−₹{couponDiscount}</span>
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">−₹{couponDiscount}</span>
               </div>
               <p className="mt-0.5 text-xs text-green-600">
                 Recalculated by the server against the saved subtotal when you save.
               </p>
             </div>
           )}
-          <div className="mt-3 flex items-center justify-between rounded-lg bg-card px-4 py-2.5">
+          <div className="mt-3 flex items-center justify-between rounded-xl border border-border/70 bg-secondary/40 px-4 py-3">
             <span className="text-sm font-medium">Final Amount</span>
             <span className="font-heading text-lg font-bold text-primary">₹{finalAmount}</span>
           </div>
@@ -279,7 +280,7 @@ function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
         {/* Actions */}
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-between">
           <button onClick={handleCancel} disabled={saving || booking.status === "Cancelled"} className="rounded-full border border-destructive/30 px-5 py-2.5 text-sm font-semibold text-destructive hover:bg-destructive/5 disabled:opacity-50">Cancel Booking</button>
-          <button onClick={handleSave} disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
+          <button onClick={handleSave} disabled={saving} className="shine inline-flex h-11 items-center justify-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none">
             {saving ? "Saving..." : <><Save className="h-4 w-4" /> Save Changes</>}
           </button>
         </div>
@@ -290,14 +291,14 @@ function BookingModal({ booking, serviceBoys, onClose, onSaved }) {
 
 function statusColor(status) {
   const map = {
-    "Booking Requested": "bg-amber-50 text-amber-700",
-    "Booking Confirmed": "bg-blue-50 text-blue-700",
-    "Service Boy Assigned": "bg-indigo-50 text-indigo-700",
-    "Clothes Picked Up": "bg-cyan-50 text-cyan-700",
-    "Cleaning in Progress": "bg-violet-50 text-violet-700",
-    "Ready for Delivery": "bg-teal-50 text-teal-700",
-    "Delivered": "bg-emerald-50 text-emerald-700",
-    "Cancelled": "bg-red-50 text-red-700",
+    "Booking Requested": "status-requested",
+    "Booking Confirmed": "status-confirmed",
+    "Service Boy Assigned": "status-assigned",
+    "Clothes Picked Up": "status-pickedup",
+    "Cleaning in Progress": "status-cleaning",
+    "Ready for Delivery": "status-ready",
+    "Delivered": "status-delivered",
+    "Cancelled": "status-cancelled",
   };
-  return map[status] || "bg-secondary text-muted-foreground";
+  return `status-pill ${map[status] || "status-neutral"}`;
 }

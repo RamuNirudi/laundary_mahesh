@@ -66,37 +66,38 @@ export default function AdminExpenses() {
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">Expenses</h1>
+          <p className="eyebrow">Ledger</p>
+          <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Expenses</h1>
           <p className="mt-1 text-sm text-muted-foreground">Track all business expenses.</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30">
+        <button onClick={() => setShowForm(true)} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-5 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]">
           <Plus className="h-4 w-4" /> Add Expense
         </button>
       </div>
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 text-red-600"><Receipt className="h-5 w-5" /></div>
+        <div className="surface edge-light rounded-2xl p-5">
+          <div className="tile-danger flex h-12 w-12 items-center justify-center rounded-xl"><Receipt className="h-5 w-5" /></div>
           <p className="mt-4 font-heading text-2xl font-bold">₹{total.toLocaleString()}</p>
           <p className="text-sm text-muted-foreground">Total Expenses</p>
         </div>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Receipt className="h-5 w-5" /></div>
+        <div className="surface edge-light rounded-2xl p-5">
+          <div className="tile-primary flex h-12 w-12 items-center justify-center rounded-xl"><Receipt className="h-5 w-5" /></div>
           <p className="mt-4 font-heading text-2xl font-bold">{expenses.length}</p>
           <p className="text-sm text-muted-foreground">Total Entries</p>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="overflow-hidden surface edge-light rounded-2xl">
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3].map((i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-secondary/50" />)}</div>
+          <div className="p-6 space-y-3">{[1,2,3].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
         ) : expenses.length === 0 ? (
           <div className="p-12 text-center text-sm text-muted-foreground">No expenses recorded yet.</div>
         ) : (
           <>
             <table className="hidden w-full sm:table">
-              <thead className="border-b border-border bg-secondary/30">
-                <tr className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="border-b border-border/70 bg-secondary/40">
+                <tr className="text-left text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   <th className="px-6 py-3">Name</th>
                   <th className="px-6 py-3">Category</th>
                   <th className="px-6 py-3">Date</th>
@@ -106,7 +107,7 @@ export default function AdminExpenses() {
               </thead>
               <tbody className="divide-y divide-border">
                 {expenses.map((exp) => (
-                  <tr key={exp.id} className="hover:bg-secondary/20">
+                  <tr key={exp.id} className="transition-colors duration-200 hover:bg-primary/5">
                     <td className="px-6 py-4"><p className="text-sm font-medium">{exp.name}</p>{exp.notes && <p className="text-xs text-muted-foreground">{exp.notes}</p>}</td>
                     <td className="px-6 py-4"><span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">{exp.category}</span></td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{exp.date}</td>
@@ -139,7 +140,7 @@ export default function AdminExpenses() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/30 backdrop-blur-sm sm:items-center" onClick={() => setShowForm(false)}>
-          <form onSubmit={handleAdd} className="w-full max-w-lg rounded-t-3xl bg-card p-6 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+          <form onSubmit={handleAdd} className="w-full max-w-lg animate-scale-in rounded-t-3xl border border-border/70 bg-card/95 p-7 shadow-2xl backdrop-blur-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-xl font-bold">Add Expense</h2>
               <button type="button" onClick={() => setShowForm(false)} className="rounded-lg p-2 hover:bg-secondary"><X className="h-5 w-5" /></button>
@@ -147,7 +148,7 @@ export default function AdminExpenses() {
             <div className="mt-5 space-y-4">
               <div>
                 <label className="text-sm font-medium">Expense Name *</label>
-                <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="field mt-2" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -158,21 +159,21 @@ export default function AdminExpenses() {
                 </div>
                 <div>
                   <label className="text-sm font-medium">Amount (₹) *</label>
-                  <input required type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                  <input required type="number" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="field mt-2" />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium">Date *</label>
-                <input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                <input required type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="field mt-2" />
               </div>
               <div>
                 <label className="text-sm font-medium">Notes</label>
-                <textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                <textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="field-area mt-2" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button type="button" onClick={() => setShowForm(false)} className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-secondary">Cancel</button>
-              <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30">
+              <button type="submit" className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]">
                 <Save className="h-4 w-4" /> Add Expense
               </button>
             </div>

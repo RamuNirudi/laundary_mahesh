@@ -24,43 +24,49 @@ export default function CustomerDashboard() {
   const completed = bookings.filter((b) => b.status === "Delivered").length;
 
   const cards = [
-    { label: "Active Bookings", value: active, icon: Package, color: "text-primary", bg: "bg-primary/10" },
-    { label: "Completed Bookings", value: completed, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { label: "Total Bookings", value: bookings.length, icon: CalendarCheck, color: "text-accent", bg: "bg-accent/10" },
+    { label: "Active Bookings", value: active, icon: Package, tile: "tile-primary" },
+    { label: "Completed Bookings", value: completed, icon: CheckCircle2, tile: "tile-success" },
+    { label: "Total Bookings", value: bookings.length, icon: CalendarCheck, tile: "tile-accent" },
   ];
 
   return (
     <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
-      <div className="mb-8">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">Welcome back 👋</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Here's an overview of your laundry bookings.</p>
+      <div className="mb-10">
+        <p className="eyebrow">Overview</p>
+        <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+          Welcome back <span className="inline-block animate-float">👋</span>
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">Here's an overview of your laundry bookings.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {cards.map((c) => {
+        {cards.map((c, i) => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="rounded-2xl border border-border bg-card p-5">
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${c.bg} ${c.color}`}>
+            <div key={c.label} className={`stat-tile animate-fade-up stagger-${i + 1}`}>
+              <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-primary/8 blur-2xl" />
+              <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl ${c.tile}`}>
                 <Icon className="h-5 w-5" />
               </div>
-              <p className="mt-4 font-heading text-3xl font-bold">{loading ? "—" : c.value}</p>
-              <p className="text-sm text-muted-foreground">{c.label}</p>
+              <p className="relative mt-5 font-heading text-4xl font-bold tracking-tight tabular">
+                {loading ? <span className="text-muted-foreground/40">—</span> : c.value}
+              </p>
+              <p className="relative mt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{c.label}</p>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+      <div className="mt-8 surface edge-light rounded-2xl p-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-heading text-lg font-semibold">Recent Bookings</h2>
-          <Link to="/dashboard/bookings" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
+          <h2 className="font-heading text-lg font-bold tracking-tight">Recent Bookings</h2>
+          <Link to="/dashboard/bookings" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-all duration-300 ease-swift hover:gap-2.5">
             View all <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
         {loading ? (
           <div className="mt-4 space-y-2">
-            {[1, 2, 3].map((i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-secondary/50" />)}
+            {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
           </div>
         ) : bookings.length === 0 ? (
           <div className="mt-8 text-center">
@@ -76,14 +82,14 @@ export default function CustomerDashboard() {
         ) : (
           <div className="mt-4 divide-y divide-border">
             {bookings.slice(0, 5).map((b) => (
-              <Link key={b.id} to={`/dashboard/bookings/${b.id}`} className="flex items-center justify-between py-3 hover:bg-secondary/30 -mx-2 px-2 rounded-lg transition-colors">
+              <Link key={b.id} to={`/dashboard/bookings/${b.id}`} className="flex items-center justify-between py-3 transition-colors duration-200 hover:bg-primary/5 -mx-2 px-2 rounded-lg transition-colors">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{b.booking_id}</p>
                   <p className="text-xs text-muted-foreground">{(b.services || []).map((s) => s.service_name).join(", ") || "Laundry Service"}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">{b.pickup_date}</p>
-                  <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(b.status)}`}>{b.status}</span>
+                  <span className={`mt-1.5 inline-block ${statusColor(b.status)}`}>{b.status}</span>
                 </div>
               </Link>
             ))}
@@ -96,14 +102,14 @@ export default function CustomerDashboard() {
 
 function statusColor(status) {
   const map = {
-    "Booking Requested": "bg-amber-50 text-amber-700",
-    "Booking Confirmed": "bg-blue-50 text-blue-700",
-    "Service Boy Assigned": "bg-indigo-50 text-indigo-700",
-    "Clothes Picked Up": "bg-cyan-50 text-cyan-700",
-    "Cleaning in Progress": "bg-violet-50 text-violet-700",
-    "Ready for Delivery": "bg-teal-50 text-teal-700",
-    "Delivered": "bg-emerald-50 text-emerald-700",
-    "Cancelled": "bg-red-50 text-red-700",
+    "Booking Requested": "status-requested",
+    "Booking Confirmed": "status-confirmed",
+    "Service Boy Assigned": "status-assigned",
+    "Clothes Picked Up": "status-pickedup",
+    "Cleaning in Progress": "status-cleaning",
+    "Ready for Delivery": "status-ready",
+    "Delivered": "status-delivered",
+    "Cancelled": "status-cancelled",
   };
-  return map[status] || "bg-secondary text-muted-foreground";
+  return `status-pill ${map[status] || "status-neutral"}`;
 }

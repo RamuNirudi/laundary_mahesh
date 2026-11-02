@@ -39,27 +39,27 @@ export default function BookingDetail() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           {/* Booking header */}
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="surface edge-light rounded-2xl p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Booking ID</p>
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">Booking ID</p>
                 <h1 className="font-heading text-2xl font-bold">{booking.booking_id}</h1>
               </div>
-              <span className={`rounded-full px-3 py-1 text-sm font-medium ${statusColor(booking.status)}`}>{booking.status}</span>
+              <span className={statusColor(booking.status)}>{booking.status}</span>
             </div>
           </div>
 
           {/* Status tracker */}
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <h2 className="font-heading text-lg font-semibold">Booking Progress</h2>
+          <div className="surface edge-light rounded-2xl p-6">
+            <h2 className="font-heading text-lg font-bold tracking-tight">Booking Progress</h2>
             <div className="mt-6">
               <StatusTracker status={booking.status} />
             </div>
           </div>
 
           {/* Services */}
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <h2 className="flex items-center gap-2 font-heading text-lg font-semibold"><Shirt className="h-5 w-5 text-primary" /> Services</h2>
+          <div className="surface edge-light rounded-2xl p-6">
+            <h2 className="flex items-center gap-2 font-heading text-lg font-bold tracking-tight"><Shirt className="h-5 w-5 text-primary" /> Services</h2>
             <div className="mt-4 space-y-2">
               {(booking.services || []).map((s, i) => (
                 <div key={i} className="flex items-center justify-between rounded-xl border border-border p-3">
@@ -85,7 +85,7 @@ export default function BookingDetail() {
           {/* Amount (if set by admin) */}
           {booking.amount_set && (
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
-              <h2 className="flex items-center gap-2 font-heading text-lg font-semibold"><Sparkles className="h-5 w-5 text-primary" /> Bill Summary</h2>
+              <h2 className="flex items-center gap-2 font-heading text-lg font-bold tracking-tight"><Sparkles className="h-5 w-5 text-primary" /> Bill Summary</h2>
               <div className="mt-4 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Service Price</span><span>₹{booking.service_price || 0}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Additional Charges</span><span>₹{booking.additional_charges || 0}</span></div>
@@ -101,7 +101,7 @@ export default function BookingDetail() {
 
         {/* Sidebar info */}
         <div className="space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="surface edge-light rounded-2xl p-6">
             <h2 className="font-heading text-base font-semibold">Pickup Details</h2>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex gap-3"><MapPin className="h-4 w-4 shrink-0 text-primary mt-0.5" /><div><p className="text-xs text-muted-foreground">Address</p><p>{booking.pickup_address}</p></div></div>
@@ -110,7 +110,7 @@ export default function BookingDetail() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="surface edge-light rounded-2xl p-6">
             <h2 className="font-heading text-base font-semibold">Customer Info</h2>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex gap-3"><User className="h-4 w-4 shrink-0 text-primary mt-0.5" /><div><p className="text-xs text-muted-foreground">Name</p><p>{booking.customer_name}</p></div></div>
@@ -119,7 +119,7 @@ export default function BookingDetail() {
           </div>
 
           {booking.service_boy_name && (
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="surface edge-light rounded-2xl p-6">
               <h2 className="font-heading text-base font-semibold">Service Boy</h2>
               <div className="mt-4 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">{booking.service_boy_name.charAt(0)}</div>
@@ -135,14 +135,14 @@ export default function BookingDetail() {
 
 function statusColor(status) {
   const map = {
-    "Booking Requested": "bg-amber-50 text-amber-700",
-    "Booking Confirmed": "bg-blue-50 text-blue-700",
-    "Service Boy Assigned": "bg-indigo-50 text-indigo-700",
-    "Clothes Picked Up": "bg-cyan-50 text-cyan-700",
-    "Cleaning in Progress": "bg-violet-50 text-violet-700",
-    "Ready for Delivery": "bg-teal-50 text-teal-700",
-    "Delivered": "bg-emerald-50 text-emerald-700",
-    "Cancelled": "bg-red-50 text-red-700",
+    "Booking Requested": "status-requested",
+    "Booking Confirmed": "status-confirmed",
+    "Service Boy Assigned": "status-assigned",
+    "Clothes Picked Up": "status-pickedup",
+    "Cleaning in Progress": "status-cleaning",
+    "Ready for Delivery": "status-ready",
+    "Delivered": "status-delivered",
+    "Cancelled": "status-cancelled",
   };
-  return map[status] || "bg-secondary text-muted-foreground";
+  return `status-pill ${map[status] || "status-neutral"}`;
 }

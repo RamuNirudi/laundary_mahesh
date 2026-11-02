@@ -21,16 +21,18 @@ export default function About() {
     <div className="min-h-screen bg-background">
       <PublicNavbar />
 
-      <section className="relative overflow-hidden pt-28 pb-16 lg:pt-36">
+      <section className="relative overflow-hidden pb-20 pt-32 lg:pt-40">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-secondary/60 via-background to-background" />
-          <div className="absolute left-[-5%] top-[10%] h-[400px] w-[400px] rounded-full bg-accent/8 blur-3xl animate-aurora" />
+          <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background" />
+          <div className="absolute left-[-6%] top-[8%] h-[30rem] w-[30rem] animate-aurora rounded-full bg-accent/14 blur-[120px]" />
+          <div className="absolute right-[-6%] top-[30%] h-[26rem] w-[26rem] animate-aurora rounded-full bg-primary/12 blur-[120px]" style={{ animationDelay: "-8s" }} />
         </div>
+        <div className="absolute inset-0 -z-10 bg-grid bg-grid-fade opacity-50" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="animate-fade-up">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">About Us</p>
-              <h1 className="mt-3 font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
+              <p className="eyebrow">About Us</p>
+              <h1 className="mt-4 text-balance font-heading text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
                 Garment stewardship, <span className="text-gradient">redefined</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
@@ -39,36 +41,39 @@ export default function About() {
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
                 From everyday wash-and-fold to intricate saree rolling and leather cleaning, our trained team treats every garment with the precision it deserves.
               </p>
-              <div className="mt-8 flex gap-3">
-                <Button onClick={() => navigate("/book")} className="rounded-full px-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30">Book Now <ArrowRight className="ml-2 h-4 w-4" /></Button>
-                <Button variant="outline" onClick={() => navigate("/services")} className="rounded-full px-6">Our Services</Button>
+              <div className="mt-10 flex flex-wrap gap-3">
+                <Button size="lg" onClick={() => navigate("/book")}>Book Now <ArrowRight className="h-4 w-4" /></Button>
+                <Button size="lg" variant="outline" onClick={() => navigate("/services")}>Our Services</Button>
               </div>
             </div>
-            <div className="relative animate-fade-up" style={{ animationDelay: "0.15s" }}>
-              <div className="overflow-hidden rounded-3xl border border-border shadow-xl shadow-primary/10">
+            <div className="animate-fade-up stagger-3 relative">
+              <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-brand opacity-20 blur-3xl" />
+              <div className="border-gradient relative overflow-hidden rounded-3xl border border-border/60 shadow-2xl">
                 <Image src={ABOUT_IMG} alt="Premium fabric care" fittingType="fill" className="aspect-[4/3] w-full" />
+                <div className="absolute inset-0 bg-gradient-to-t from-accent/20 via-transparent to-transparent" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-secondary/30">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative border-y border-border/70 bg-secondary/25 py-24">
+        <div className="absolute inset-0 bg-dots opacity-40" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Our Values</p>
-            <h2 className="mt-3 font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">What we stand for</h2>
+            <p className="eyebrow">Our Values</p>
+            <h2 className="mt-4 font-heading text-3xl font-bold tracking-tight text-foreground sm:text-5xl">What we stand for</h2>
           </div>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {VALUES.map((v) => {
+          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {VALUES.map((v, i) => {
               const Icon = v.icon;
               return (
-                <div key={v.title} className="group rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/30">
+                <div key={v.title} className={`surface surface-hover edge-light animate-fade-up stagger-${i + 1} group rounded-2xl p-7`}>
+                  <div className="flex items-center justify-center rounded-xl border border-primary/20 bg-primary/8 text-primary transition-all duration-500 ease-swift group-hover:scale-110 group-hover:border-transparent group-hover:bg-gradient-brand group-hover:text-primary-foreground group-hover:shadow-glow" style={{ height: 52, width: 52 }}>
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="mt-5 font-heading text-lg font-semibold">{v.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
+                  <h3 className="mt-6 font-heading text-lg font-bold tracking-tight">{v.title}</h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
                 </div>
               );
             })}
@@ -76,21 +81,19 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-20">
+      <section className="py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 text-center sm:grid-cols-3">
-            <div className="group">
-              <p className="font-heading text-5xl font-bold text-gradient">10K+</p>
-              <p className="mt-2 text-sm text-muted-foreground">Garments cared for</p>
-            </div>
-            <div className="group">
-              <p className="font-heading text-5xl font-bold text-gradient">19</p>
-              <p className="mt-2 text-sm text-muted-foreground">Specialized services</p>
-            </div>
-            <div className="group">
-              <p className="font-heading text-5xl font-bold text-gradient">4.9★</p>
-              <p className="mt-2 text-sm text-muted-foreground">Average rating</p>
-            </div>
+          <div className="surface edge-light grid gap-10 rounded-3xl px-8 py-12 text-center sm:grid-cols-3">
+            {[
+              { value: "10K+", label: "Garments cared for" },
+              { value: "19", label: "Specialized services" },
+              { value: "4.9\u2605", label: "Average rating" },
+            ].map((stat, i) => (
+              <div key={stat.label} className={`animate-fade-up stagger-${i + 1} sm:border-r sm:border-border/70 sm:last:border-r-0`}>
+                <p className="text-gradient font-heading text-5xl font-bold tracking-tight tabular sm:text-6xl">{stat.value}</p>
+                <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

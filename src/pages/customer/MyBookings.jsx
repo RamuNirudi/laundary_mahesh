@@ -33,7 +33,8 @@ export default function MyBookings() {
   return (
     <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">My Bookings</h1>
+        <p className="eyebrow">Account</p>
+        <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">My Bookings</h1>
         <p className="mt-1 text-sm text-muted-foreground">Track and manage all your laundry bookings.</p>
       </div>
 
@@ -44,22 +45,22 @@ export default function MyBookings() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by booking ID or service..."
-            className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="field w-full pl-10"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-primary"
+          className="field w-full sm:w-auto"
         >
           {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="overflow-hidden surface edge-light rounded-2xl">
         {loading ? (
           <div className="p-6 space-y-3">
-            {[1, 2, 3].map((i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-secondary/50" />)}
+            {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">
@@ -71,8 +72,8 @@ export default function MyBookings() {
           <>
             {/* Desktop table */}
             <table className="hidden w-full sm:table">
-              <thead className="border-b border-border bg-secondary/30">
-                <tr className="text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="border-b border-border/70 bg-secondary/40">
+                <tr className="text-left text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                   <th className="px-6 py-3">Booking ID</th>
                   <th className="px-6 py-3">Service</th>
                   <th className="px-6 py-3">Pickup Date</th>
@@ -82,13 +83,13 @@ export default function MyBookings() {
               </thead>
               <tbody className="divide-y divide-border">
                 {filtered.map((b) => (
-                  <tr key={b.id} className="hover:bg-secondary/20">
+                  <tr key={b.id} className="transition-colors duration-200 hover:bg-primary/5">
                     <td className="px-6 py-4 text-sm font-semibold">{b.booking_id}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{(b.services || []).map((s) => s.service_name).join(", ") || "—"}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{b.pickup_date}</td>
-                    <td className="px-6 py-4"><span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(b.status)}`}>{b.status}</span></td>
+                    <td className="px-6 py-4"><span className={statusColor(b.status)}>{b.status}</span></td>
                     <td className="px-6 py-4 text-right">
-                      <Link to={`/dashboard/bookings/${b.id}`} className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
+                      <Link to={`/dashboard/bookings/${b.id}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-all duration-300 ease-swift hover:gap-2.5">
                         <Eye className="h-4 w-4" /> View
                       </Link>
                     </td>
@@ -99,10 +100,10 @@ export default function MyBookings() {
             {/* Mobile cards */}
             <div className="sm:hidden divide-y divide-border">
               {filtered.map((b) => (
-                <Link key={b.id} to={`/dashboard/bookings/${b.id}`} className="block p-4 hover:bg-secondary/20">
+                <Link key={b.id} to={`/dashboard/bookings/${b.id}`} className="block p-4 transition-colors duration-200 hover:bg-primary/5">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">{b.booking_id}</p>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(b.status)}`}>{b.status}</span>
+                    <span className={statusColor(b.status)}>{b.status}</span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{(b.services || []).map((s) => s.service_name).join(", ") || "—"}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{b.pickup_date} • {b.pickup_time}</p>
@@ -118,14 +119,14 @@ export default function MyBookings() {
 
 function statusColor(status) {
   const map = {
-    "Booking Requested": "bg-amber-50 text-amber-700",
-    "Booking Confirmed": "bg-blue-50 text-blue-700",
-    "Service Boy Assigned": "bg-indigo-50 text-indigo-700",
-    "Clothes Picked Up": "bg-cyan-50 text-cyan-700",
-    "Cleaning in Progress": "bg-violet-50 text-violet-700",
-    "Ready for Delivery": "bg-teal-50 text-teal-700",
-    "Delivered": "bg-emerald-50 text-emerald-700",
-    "Cancelled": "bg-red-50 text-red-700",
+    "Booking Requested": "status-requested",
+    "Booking Confirmed": "status-confirmed",
+    "Service Boy Assigned": "status-assigned",
+    "Clothes Picked Up": "status-pickedup",
+    "Cleaning in Progress": "status-cleaning",
+    "Ready for Delivery": "status-ready",
+    "Delivered": "status-delivered",
+    "Cancelled": "status-cancelled",
   };
-  return map[status] || "bg-secondary text-muted-foreground";
+  return `status-pill ${map[status] || "status-neutral"}`;
 }

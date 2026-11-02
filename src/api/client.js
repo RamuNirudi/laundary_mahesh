@@ -1,7 +1,13 @@
 // Shared fetch wrapper for the Node.js API. Every client module in src/api
 // goes through `request`, so auth headers and error handling live in one place.
 
-const API_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api").replace(/\/$/, "");
+// Default to the same-origin "/api" path, which the Vite dev server proxies to
+// the API (see vite.config.js). Going through the proxy keeps development
+// requests same-origin, so there is no CORS preflight, and the browser never
+// has to resolve the API host itself — "localhost" can resolve to ::1, where
+// an unrelated listener (WSL's port forwarder, for one) may answer instead of
+// the API. Deployments set VITE_API_BASE_URL to the real absolute URL.
+const API_URL = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
 const TOKEN_KEY = "laundry_access_token";
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);

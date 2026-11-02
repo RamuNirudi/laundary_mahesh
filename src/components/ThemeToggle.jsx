@@ -1,6 +1,7 @@
 import React from "react";
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
+import { cn } from "@/lib/utils";
 
 export default function ThemeToggle({ className = "" }) {
   const { theme, toggleTheme } = useTheme();
@@ -8,10 +9,15 @@ export default function ThemeToggle({ className = "" }) {
     <button
       onClick={toggleTheme}
       aria-label="Toggle theme"
-      className={`relative flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/60 backdrop-blur-md transition-all duration-300 hover:border-primary/40 hover:bg-secondary hover:shadow-md hover:shadow-primary/10 ${className}`}
+      // cn() merges through tailwind-merge, so a caller's colours win over the
+      // defaults instead of depending on stylesheet order.
+      className={cn(
+        "relative flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-all duration-300 hover:border-primary/50 hover:text-primary",
+        className,
+      )}
     >
-      <Sun className={`h-4 w-4 transition-all duration-500 ${theme === "dark" ? "rotate-0 scale-100" : "-rotate-90 scale-0"} absolute`} />
-      <Moon className={`h-4 w-4 transition-all duration-500 ${theme === "dark" ? "rotate-90 scale-0" : "rotate-0 scale-100"} absolute`} />
+      <Sun className={`absolute h-4 w-4 transition-all duration-500 ${theme === "dark" ? "rotate-0 scale-100" : "-rotate-90 scale-0"}`} />
+      <Moon className={`absolute h-4 w-4 transition-all duration-500 ${theme === "dark" ? "rotate-90 scale-0" : "rotate-0 scale-100"}`} />
     </button>
   );
 }

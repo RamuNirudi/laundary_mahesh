@@ -53,16 +53,17 @@ export default function Profile() {
 
   return (
     <DashboardLayout role="customer" navItems={NAV} title="Customer Panel" showPublicNavbar>
-      <h1 className="font-heading text-2xl font-bold tracking-tight">My Profile</h1>
+      <p className="eyebrow">Account</p>
+      <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">My Profile</h1>
       <p className="mt-1 text-sm text-muted-foreground">Manage your account information.</p>
 
-      <div className="mt-8 max-w-lg rounded-2xl border border-border bg-card p-6">
+      <div className="mt-8 max-w-lg surface edge-light rounded-2xl p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground">
             {(user?.full_name || "U").charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="font-heading text-lg font-semibold">{user?.full_name}</p>
+            <p className="font-heading text-lg font-bold tracking-tight">{user?.full_name}</p>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
           </div>
         </div>
@@ -76,7 +77,7 @@ export default function Profile() {
               maxLength={120}
               required
               placeholder="Enter your full name"
-              className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="field mt-2"
             />
           </div>
           <div>
@@ -88,10 +89,10 @@ export default function Profile() {
               inputMode="tel"
               required
               placeholder="Enter your phone number"
-              className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="field mt-2"
             />
           </div>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
+          <button type="submit" disabled={saving} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none">
             <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Changes"}
           </button>
         </form>

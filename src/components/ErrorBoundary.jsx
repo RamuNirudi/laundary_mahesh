@@ -36,7 +36,7 @@ export default class ErrorBoundary extends React.Component {
         </pre>
         <button
           onClick={() => window.location.reload()}
-          className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30"
+          className="mt-5 shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]"
         >
           <RefreshCw className="h-4 w-4" /> Reload page
         </button>

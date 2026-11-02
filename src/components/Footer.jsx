@@ -1,7 +1,32 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sparkles, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { Phone, Mail, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Logo from "@/components/Logo";
+
+const EXPLORE = [
+  { label: "Home", to: "/" },
+  { label: "Services", to: "/services" },
+  { label: "About Us", to: "/about" },
+  { label: "Contact", to: "/contact" },
+];
+
+const ACCOUNT = [
+  { label: "Login", to: "/login" },
+  { label: "Register", to: "/register" },
+  { label: "Book Now", to: "/book" },
+  { label: "My Dashboard", to: "/dashboard" },
+];
+
+const FooterLink = ({ to, children }) => (
+  <Link
+    to={to}
+    className="group inline-flex items-center gap-1.5 text-sm text-navy-muted transition-all duration-300 hover:text-primary"
+  >
+    <span className="h-px w-0 bg-primary transition-all duration-300 group-hover:w-3" />
+    {children}
+  </Link>
+);
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -13,77 +38,139 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative mt-20 overflow-hidden border-t border-border bg-card">
-      <div className="absolute right-[-5%] top-[-50%] h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
+    <footer className="relative mt-24 overflow-hidden bg-navy text-white">
+      <div className="pointer-events-none absolute right-[-8%] top-[-40%] h-[30rem] w-[30rem] animate-aurora rounded-full bg-primary/12 blur-[110px]" />
+      <div
+        className="pointer-events-none absolute left-[-8%] bottom-[-50%] h-[26rem] w-[26rem] animate-aurora rounded-full bg-primary/8 blur-[110px]"
+        style={{ animationDelay: "-10s" }}
+      />
+
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-heading text-base font-bold">STAR LAUNDROVAMAT</p>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Premium Garment Stewardship</p>
-              </div>
-            </div>
-            <p className="!mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            <Logo
+              tagline="Premium Garment Stewardship"
+              markClassName="h-12 w-auto"
+              titleClassName="text-white"
+              taglineClassName="text-navy-muted"
+            />
+            <p className="!mt-5 max-w-xs text-sm leading-relaxed text-navy-muted">
               Professional laundry and dry cleaning delivered to your doorstep. Premium fabric care with every collection.
             </p>
-            <div className="mt-6 space-y-2.5">
-              <a href="tel:+919999999999" className="flex items-center gap-2.5 text-sm text-muted-foreground transition-colors hover:text-primary">
-                <Phone className="h-4 w-4" /> +91 99999 99999
+            <div className="mt-7 space-y-3">
+              <a href="tel:+919999999999" className="group flex items-center gap-3 text-sm text-navy-muted transition-colors hover:text-primary">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/10 transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Phone className="h-3.5 w-3.5" />
+                </span>
+                +91 86396 67975
               </a>
-              <a href="mailto:care@starlaundrovamat.com" className="flex items-center gap-2.5 text-sm text-muted-foreground transition-colors hover:text-primary">
-                <Mail className="h-4 w-4" /> care@starlaundrovamat.com
+              <a href="mailto:care@starlaundrovamat.com" className="group flex items-center gap-3 text-sm text-navy-muted transition-colors hover:text-primary">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/10 transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Mail className="h-3.5 w-3.5" />
+                </span>
+                starlaundrovamat@gmail.com
               </a>
-              <p className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" /> Available across the city
+              <div className="mt-4 flex items-start gap-3 text-sm text-navy-muted">
+  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/10">
+    <MapPin className="h-4 w-4" />
+  </span>
+
+  <div className="flex flex-1 flex-row gap-11">
+    <p className="flex-1 ">
+      H.NO 8-4/C, Street No. 8, Ravindra Nagar Colony,
+      Saraswathi Nagar, Habsiguda, Hyderabad, Telangana 500013
+    </p>
+
+    <p className="flex-1">
+      House No. 8-6-8/2 Road No. 2, Post,
+      Chintalkunta, Telangana 500074
+    </p>
+
+    <p className="flex-1">
+      9H72+96 Jaya Apartment, 11-13-1044,
+      Arunodayanagar Rd No. 1, Margadarshi Colony,
+      Kothapet, Hyderabad, Telangana 500102
+    </p>
+    <p className="flex-1">
+      opposite to gully cricket, near Pochamma Temple Lane, Pochammabasti, Krishna Vihar, Sharada Nagar, Kothapet, Hyderabad, Telangana 500035
+    </p>
+    <p className="flex-1">
+      Rd Number 19, opposite to Ganesh Nagar, Cooperative Bank Colony, Nagole, Hyderabad, Telangana 500068
+Map of Knots and Threads Designer Studio (Boutique)
+    </p>
+    <p className="flex-1">
+     Satyanarayanapuram Colony, Prabhat Nagar Colony, Kothapet, Hyderabad, Telangana 500060 (Dreams boutique)
+    </p>
+    <p className="flex-1">
+     Street no 2, Akshvani Nagar Colony, Mallikarjuna Nagar, Jahangir Nagar Colony, Hyderabad, Telangana 500074 
+Arna reddy  desinger studio
+    </p>
+  </div>
+</div>
+              {/* <p className="flex items-center gap-3 text-sm text-navy-muted">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/10">
+                  <MapPin className="h-4.5 w-4.5" />
+                </span>
+                H.NO 8-4/C, Street No. 8, Ravindra Nagar Colony, Saraswathi Nagar, Habsiguda, Hyderabad, Telangana 500013
               </p>
+              <p className="flex items-center gap-3 text-sm text-navy-muted">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/10">
+                  <MapPin className="h-3.5 w-3.5" />
+                </span>
+                House No.8-6-8/2 Road No.2, Post, Chintalkunta, Telangana 500074
+              </p>
+              <p className="flex items-center gap-3 text-sm text-navy-muted">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/10">
+                  <MapPin className="h-3.5 w-3.5" />
+                </span>
+                9H72+96 Jaya Apartment, 11-13-1044, Arunodayanagar Rd No.1, Margadarshi Colony, Kothapet, Hyderabad, Telangana 500102
+              </p> */}
             </div>
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">Explore</h4>
-            <ul className="mt-4 space-y-2.5">
-              <li><Link to="/" className="text-sm text-muted-foreground transition-colors hover:text-primary">Home</Link></li>
-              <li><Link to="/services" className="text-sm text-muted-foreground transition-colors hover:text-primary">Services</Link></li>
-              <li><Link to="/about" className="text-sm text-muted-foreground transition-colors hover:text-primary">About Us</Link></li>
-              <li><Link to="/contact" className="text-sm text-muted-foreground transition-colors hover:text-primary">Contact</Link></li>
+            <h4 className="font-heading text-sm font-extrabold text-white">Quick Links</h4>
+            <ul className="mt-5 space-y-3">
+              {EXPLORE.map((link) => (
+                <li key={link.label}><FooterLink to={link.to}>{link.label}</FooterLink></li>
+              ))}
             </ul>
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">Account</h4>
-            <ul className="mt-4 space-y-2.5">
-              <li><Link to="/login" className="text-sm text-muted-foreground transition-colors hover:text-primary">Login</Link></li>
-              <li><Link to="/register" className="text-sm text-muted-foreground transition-colors hover:text-primary">Register</Link></li>
-              <li><Link to="/book" className="text-sm text-muted-foreground transition-colors hover:text-primary">Book Now</Link></li>
-              <li><Link to="/dashboard" className="text-sm text-muted-foreground transition-colors hover:text-primary">My Dashboard</Link></li>
+            <h4 className="font-heading text-sm font-extrabold text-white">Account</h4>
+            <ul className="mt-5 space-y-3">
+              {ACCOUNT.map((link) => (
+                <li key={link.label}><FooterLink to={link.to}>{link.label}</FooterLink></li>
+              ))}
             </ul>
           </div>
 
           <div className="lg:col-span-4">
-            <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">Quick Book</h4>
-            <p className="mt-4 text-sm text-muted-foreground">Schedule a pickup in under 60 seconds.</p>
-            <form onSubmit={quickBook} className="mt-4 flex gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email"
-                className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
-              />
-              <Button type="submit" className="rounded-full px-5 shadow-md shadow-primary/20">
-                Book <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-            </form>
+            <div className="rounded-2xl border border-white/12 bg-white/5 p-6">
+              <h4 className="text-xs font-extrabold uppercase tracking-[0.2em] text-primary">Quick Book</h4>
+              <p className="mt-3 font-heading text-lg font-extrabold tracking-tight text-white">Schedule a pickup in under 60 seconds.</p>
+              <form onSubmit={quickBook} className="mt-5 flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email"
+                  className="h-11 flex-1 rounded-full border border-white/15 bg-white/10 px-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-navy-muted focus:border-primary focus:ring-4 focus:ring-primary/20"
+                />
+                <Button type="submit">
+                  Book <ArrowRight className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} STAR LAUNDROVAMAT. All rights reserved.</p>
-          <div className="flex gap-6 text-xs text-muted-foreground">
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/12 pt-7 sm:flex-row">
+          <p className="text-xs text-navy-muted">
+            © {new Date().getFullYear()} STAR LAUNDROVAMAT — All rights reserved.
+          </p>
+          <div className="flex gap-7 text-xs text-navy-muted">
             <Link to="/about" className="transition-colors hover:text-primary">Privacy</Link>
             <Link to="/about" className="transition-colors hover:text-primary">Terms</Link>
             <Link to="/contact" className="transition-colors hover:text-primary">Support</Link>

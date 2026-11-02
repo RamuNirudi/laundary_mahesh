@@ -82,30 +82,31 @@ export default function AdminServices() {
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">Services</h1>
+          <p className="eyebrow">Catalogue</p>
+          <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Services</h1>
           <p className="mt-1 text-sm text-muted-foreground">Add, edit, and manage your laundry services.</p>
         </div>
-        <button onClick={() => { setEditing(EMPTY); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30">
+        <button onClick={() => { setEditing(EMPTY); setShowForm(true); }} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-5 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]">
           <Plus className="h-4 w-4" /> Add Service
         </button>
       </div>
 
       <div className="mb-5 relative max-w-md">
         <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search services..." className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search services..." className="field w-full pl-10" />
       </div>
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3,4,5,6].map((i) => <div key={i} className="h-40 animate-pulse rounded-2xl bg-secondary/50" />)}</div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3,4,5,6].map((i) => <div key={i} className="skeleton h-40 rounded-2xl" />)}</div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((svc) => (
-            <div key={svc.id} className={`rounded-2xl border border-border bg-card p-5 ${!svc.active ? "opacity-60" : ""}`}>
+            <div key={svc.id} className={`surface edge-light rounded-2xl p-5 ${!svc.active ? "opacity-60" : ""}`}>
               <div className="flex items-start justify-between">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Sparkles className="h-5 w-5" />
                 </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${svc.active ? "bg-emerald-50 text-emerald-700" : "bg-secondary text-muted-foreground"}`}>{svc.active ? "Active" : "Disabled"}</span>
+                <span className={`status-pill ${svc.active ? "flag-on" : "flag-off"}`}>{svc.active ? "Active" : "Disabled"}</span>
               </div>
               <h3 className="mt-3 font-heading text-base font-semibold">{svc.name}</h3>
               <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{svc.description || "—"}</p>
@@ -147,7 +148,7 @@ function ServiceForm({ initial, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/30 backdrop-blur-sm sm:items-center" onClick={onClose}>
-      <form onSubmit={submit} className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-card p-6 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <form onSubmit={submit} className="max-h-[92vh] w-full max-w-lg overflow-y-auto animate-scale-in rounded-t-3xl border border-border/70 bg-card/95 p-7 shadow-2xl backdrop-blur-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-xl font-bold">{initial.id ? "Edit Service" : "Add Service"}</h2>
           <button type="button" onClick={onClose} className="rounded-lg p-2 hover:bg-secondary"><X className="h-5 w-5" /></button>
@@ -155,15 +156,15 @@ function ServiceForm({ initial, onClose, onSave }) {
         <div className="mt-5 space-y-4">
           <div>
             <label className="text-sm font-medium">Service Name *</label>
-            <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="field mt-2" />
           </div>
           <div>
             <label className="text-sm font-medium">Description</label>
-            <textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            <textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="field-area mt-2" />
           </div>
           <div>
             <label className="text-sm font-medium">Image URL</label>
-            <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." className="field mt-2" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -180,11 +181,11 @@ function ServiceForm({ initial, onClose, onSave }) {
             </div>
             <div>
               <label className="text-sm font-medium">Base Price (₹)</label>
-              <input type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+              <input type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="field mt-2" />
             </div>
             <div>
               <label className="text-sm font-medium">Sort Order</label>
-              <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+              <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} className="field mt-2" />
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm font-medium">
@@ -194,7 +195,7 @@ function ServiceForm({ initial, onClose, onSave }) {
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-secondary">Cancel</button>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
+          <button type="submit" disabled={saving} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none">
             <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Service"}
           </button>
         </div>

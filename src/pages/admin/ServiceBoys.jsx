@@ -89,31 +89,32 @@ export default function AdminServiceBoys() {
     <DashboardLayout role="admin" navItems={NAV} title="Admin Panel">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold tracking-tight">Service Boys</h1>
+          <p className="eyebrow">Team</p>
+          <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">Service Boys</h1>
           <p className="mt-1 text-sm text-muted-foreground">Manage your field team.</p>
         </div>
-        <button onClick={() => setShowInvite(true)} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30">
+        <button onClick={() => setShowInvite(true)} className="shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-5 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]">
           <UserPlus className="h-4 w-4" /> Add Service Boy
         </button>
       </div>
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((i) => <div key={i} className="h-32 animate-pulse rounded-2xl bg-secondary/50" />)}</div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((i) => <div key={i} className="skeleton h-32 rounded-2xl" />)}</div>
       ) : users.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-card p-12 text-center">
+        <div className="surface edge-light rounded-2xl p-12 text-center">
           <UserCog className="mx-auto h-10 w-10 text-muted-foreground/40" />
           <p className="mt-3 text-sm font-medium">No service boys yet</p>
           <p className="mt-1 text-sm text-muted-foreground">Add team members to assign them to bookings.</p>
-          <button onClick={() => setShowInvite(true)} className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+          <button onClick={() => setShowInvite(true)} className="mt-4 shine inline-flex h-11 items-center gap-2 rounded-full bg-gradient-brand px-5 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97]">
             <UserPlus className="h-4 w-4" /> Add Now
           </button>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {users.map((u) => (
-            <div key={u.id} className="rounded-2xl border border-border bg-card p-5">
+            <div key={u.id} className="surface edge-light rounded-2xl p-5">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-lg font-bold text-indigo-600">{(u.full_name || "S").charAt(0).toUpperCase()}</div>
+                <div className="tile-indigo flex h-12 w-12 items-center justify-center rounded-2xl font-heading text-lg font-bold">{(u.full_name || "S").charAt(0).toUpperCase()}</div>
                 <div className="min-w-0">
                   <p className="truncate font-heading text-base font-semibold">{u.full_name || "—"}</p>
                   <p className="truncate text-xs text-muted-foreground">{u.email}</p>
@@ -125,7 +126,7 @@ export default function AdminServiceBoys() {
                 <p className="text-muted-foreground">{u.active_count} active • {u.assigned_count} total assigned</p>
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${u.active ? "bg-green-50 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                <span className={`status-pill ${u.active ? "flag-on" : "flag-off"}`}>
                   {u.active ? "Active" : "Deactivated"}
                 </span>
                 <div className="flex gap-1">
@@ -140,7 +141,7 @@ export default function AdminServiceBoys() {
 
       {showInvite && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/30 backdrop-blur-sm sm:items-center" onClick={() => setShowInvite(false)}>
-          <form onSubmit={handleInvite} className="w-full max-w-md rounded-t-3xl bg-card p-6 shadow-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+          <form onSubmit={handleInvite} className="w-full max-w-md animate-scale-in rounded-t-3xl border border-border/70 bg-card/95 p-7 shadow-2xl backdrop-blur-2xl sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-xl font-bold">Add Service Boy</h2>
               <button type="button" onClick={() => setShowInvite(false)} className="rounded-lg p-2 hover:bg-secondary"><X className="h-5 w-5" /></button>
@@ -149,18 +150,18 @@ export default function AdminServiceBoys() {
             <div className="mt-5 space-y-4">
               <div>
                 <label className="text-sm font-medium">Full Name</label>
-                <input required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder="Ravi Kumar" className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                <input required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder="Ravi Kumar" className="field mt-2" />
               </div>
               <div>
                 <label className="text-sm font-medium">Email Address</label>
-                <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="serviceboy@example.com" className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="serviceboy@example.com" className="field mt-2" />
               </div>
               <div>
                 <label className="text-sm font-medium">Phone</label>
-                <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+91 99999 99999" className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+                <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+91 99999 99999" className="field mt-2" />
               </div>
             </div>
-            <button type="submit" disabled={inviting} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50">
+            <button type="submit" disabled={inviting} className="mt-6 shine inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-semibold text-primary-foreground shadow-glow-sm transition-all duration-300 ease-swift hover:shadow-glow active:scale-[0.97] disabled:opacity-50 disabled:shadow-none">
               {inviting ? "Creating..." : <><Send className="h-4 w-4" /> Create Account</>}
             </button>
           </form>
